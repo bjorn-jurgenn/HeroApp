@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/layout_dialog_launches"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:padding="30dp"
+    android:gravity="center_vertical">
+
+    <TextView
+        android:id="@+id/launches_dialog_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:fontFamily="sans-serif-condensed-medium"
+        android:text="@string/add_new_item"
+        android:textSize="@dimen/custom_dialog_text_size"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+
+    <CheckBox
+        android:id="@+id/launches_dialog_year_checkbox"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/launch_year"
+        android:layout_marginTop="20dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/launches_dialog_title" />
+
+    <EditText
+        android:id="@+id/launches_dialog_year"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:autofillHints="2020"
+        android:hint="@string/_2020"
+        android:inputType="number"
+        android:layout_marginHorizontal="12dp"
+        app:layout_constraintBaseline_toBaselineOf="@id/launches_dialog_year_checkbox"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toEndOf="@+id/launches_dialog_year_checkbox" />
+
+
+    <CheckBox
+        android:id="@+id/launches_dialog_successful"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/only_successful"
+        android:layout_marginTop="12dp"
+        app:layout_constraintStart_toStartOf="@+id/launches_dialog_year_checkbox"
+        app:layout_constraintTop_toBottomOf="@+id/launches_dialog_year_checkbox" />
+
+    <Button
+        android:id="@+id/launches_dialog_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:padding="10dp"
+        android:text="@string/confirm"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/launches_dialog_successful" />
+</androidx.constraintlayout.widget.ConstraintLayout>

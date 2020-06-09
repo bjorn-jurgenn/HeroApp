@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/layout_two_edit_texts"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="center_vertical"
+    android:orientation="vertical"
+    android:paddingHorizontal="50dp"
+    android:paddingVertical="20dp"
+    android:layout_margin="30dp">
+
+    <TextView
+        android:id="@+id/layout_two_text_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:fontFamily="sans-serif-condensed-medium"
+        android:textSize="@dimen/custom_dialog_text_size"
+        android:text="@string/add_new_item" />
+
+    <EditText
+        android:id="@+id/edit_text_first"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_margin="10dp"
+        android:minWidth="100dp"
+        android:fontFamily="sans-serif-condensed-medium"
+        android:autofillHints="@string/city"
+        android:hint="@string/city"
+        android:inputType="text"
+        android:textAlignment="center" />
+
+    <EditText
+        android:id="@+id/edit_text_second"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:minWidth="100dp"
+        android:fontFamily="sans-serif-condensed-medium"
+        android:autofillHints="@string/country"
+        android:hint="@string/country"
+        android:inputType="text"
+        android:textAlignment="center" />
+
+    <Button
+        android:id="@+id/button_two_edit_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:padding="10dp"
+        android:text="@string/confirm" />
+</LinearLayout>

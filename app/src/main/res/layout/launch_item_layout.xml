@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/launch_item_layout"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_gravity="center_horizontal"
+    android:layout_margin="4dp"
+    android:background="@android:color/white"
+    android:elevation="3dp"
+    android:padding="12dp">
+
+    <TextView
+        android:id="@+id/item_name"
+        style="@style/SpaceXTitle"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="@string/name"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/item_flight"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/item_flight"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/id"
+        app:layout_constraintBaseline_toBaselineOf="@+id/item_name"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <TextView
+        android:id="@+id/item_year"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:text="@string/year"
+        app:layout_constraintStart_toStartOf="@+id/item_name"
+        app:layout_constraintTop_toBottomOf="@+id/item_name" />
+
+    <TextView
+        android:id="@+id/item_status"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:text="@string/status"
+        app:layout_constraintBaseline_toBaselineOf="@+id/item_year"
+        app:layout_constraintStart_toEndOf="@+id/item_year" />
+
+    <TextView
+        android:id="@+id/item_text_rocket"
+        style="@style/SpaceXCategory"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="@string/rocket"
+        app:layout_constraintStart_toStartOf="@+id/item_name"
+        app:layout_constraintTop_toBottomOf="@+id/item_year" />
+
+    <TextView
+        android:id="@+id/item_rocket_name"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="16dp"
+        android:text="@string/rocket"
+        app:layout_constraintBaseline_toBaselineOf="@+id/item_text_rocket"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toEndOf="@+id/item_text_rocket" />
+
+    <TextView
+        android:id="@+id/item_text_site"
+        style="@style/SpaceXCategory"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:text="@string/site"
+        app:layout_constraintStart_toStartOf="@+id/item_text_rocket"
+        app:layout_constraintTop_toBottomOf="@+id/item_text_rocket" />
+
+    <TextView
+        android:id="@+id/item_site_name"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="16dp"
+        android:text="@string/location"
+        app:layout_constraintBaseline_toBaselineOf="@+id/item_text_site"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toEndOf="@+id/item_text_rocket" />
+
+    <TextView
+        android:id="@+id/item_text_launch_date"
+        style="@style/SpaceXCategory"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:text="@string/launch"
+        app:layout_constraintStart_toStartOf="@+id/item_text_site"
+        app:layout_constraintTop_toBottomOf="@+id/item_site_name" />
+
+    <TextView
+        android:id="@+id/item_launch_date"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="16dp"
+        android:text="@string/launch"
+        app:layout_constraintBaseline_toBaselineOf="@+id/item_text_launch_date"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toEndOf="@+id/item_text_rocket" />
+
+    <!--
+    <TextView
+        android:id="@+id/item_details"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="@string/description"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/item_text_location"/>
+        -->
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<animation-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:drawable="@drawable/ic_neutral"
+        android:duration="400" />
+    <item
+        android:drawable="@drawable/ic_smile"
+        android:duration="400" />
+    <item
+        android:drawable="@drawable/ic_happy"
+        android:duration="1000" />
+    <item
+        android:drawable="@drawable/ic_smile"
+        android:duration="400" />
+    <item
+        android:drawable="@drawable/ic_neutral"
+        android:duration="400" />
+    <item
+        android:drawable="@drawable/ic_unhappy"
+        android:duration="400" />
+    <item
+        android:drawable="@drawable/ic_sad"
+        android:duration="400" />
+    <item
+        android:drawable="@drawable/ic_very_sad"
+        android:duration="1000" />
+    <item
+        android:drawable="@drawable/ic_sad"
+        android:duration="400" />
+    <item
+        android:drawable="@drawable/ic_unhappy"
+        android:duration="400" />
+</animation-list>

@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <group>
+        <item
+            android:id="@+id/menu_home"
+            android:title="@string/home" />
+
+        <item
+            android:id="@+id/menu_team_cards"
+            android:title="@string/team_cards" />
+
+        <item
+            android:id="@+id/menu_dialogs"
+            android:title="@string/dialogs" />
+        <item
+            android:id="@+id/animation"
+            android:title="@string/animation" />
+        <item
+            android:id="@+id/recycler"
+            android:title="@string/recycler_view" />
+        <item
+            android:id="@+id/landpads"
+            android:title="@string/space_x_landpads" />
+        <item
+            android:id="@+id/launches"
+            android:title="@string/space_x_launches" />
+    </group>
+
+    <item android:title="@string/settings">
+        <menu>
+            <item
+                android:id="@+id/edit_username"
+                android:icon="@drawable/ic_edit"
+                android:title="@string/edit_username" />
+        </menu>
+    </item>
+</menu>
