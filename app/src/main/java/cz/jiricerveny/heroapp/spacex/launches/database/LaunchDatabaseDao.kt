@@ -12,6 +12,8 @@ interface LaunchDatabaseDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insert(launch: Launch)
 
+    // TODO Just keep in mind, that in some cases it could be better to just filter the list programmatically
+
     @Query("SELECT * FROM launch_database")
     fun getAll(): LiveData<List<Launch>>
 

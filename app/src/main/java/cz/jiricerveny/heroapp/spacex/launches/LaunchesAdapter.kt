@@ -15,6 +15,7 @@ import java.time.format.DateTimeFormatter
 
 class LaunchesAdapter : RecyclerView.Adapter<LaunchesViewHolder>() {
     private val launches = mutableListOf<Launch>()
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): LaunchesViewHolder {
         val view =
             LayoutInflater.from(parent.context).inflate(R.layout.launch_item_layout, parent, false)
@@ -35,6 +36,7 @@ class LaunchesAdapter : RecyclerView.Adapter<LaunchesViewHolder>() {
 
 }
 
+// TODO Should be inner class of adapter as it is not likely to be shared with other adapter
 class LaunchesViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
     private val binding = LaunchItemLayoutBinding.bind(itemView)
 

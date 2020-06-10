@@ -2,7 +2,6 @@ package cz.jiricerveny.heroapp.spacex.launches
 
 import android.app.AlertDialog
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -22,6 +21,7 @@ import cz.jiricerveny.heroapp.spacex.launches.database.LaunchDatabase
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import kotlin.coroutines.coroutineContext
 
 
 class LaunchesFragment : Fragment() {
@@ -33,80 +33,78 @@ class LaunchesFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         binding = FragmentLaunchesBinding.inflate(layoutInflater, container, false)
+
         val application = requireNotNull(this.activity).application
         val dataSource = LaunchDatabase.getInstance(application).launchDatabaseDao
         val viewModelFactory = LaunchesViewModelFactory(dataSource, application)
         viewModel = ViewModelProvider(this, viewModelFactory).get(LaunchesViewModel::class.java)
-        val fab = binding.fab
+
         val recyclerView = binding.launchesRecyclerView
         val adapter = LaunchesAdapter()
         recyclerView.apply {
             layoutManager = LinearLayoutManager(activity)
             this.adapter = adapter
         }
+
         viewModel.setDisplayable()
         viewModel.displayableLaunches.observe(viewLifecycleOwner, Observer {
             adapter.update(it ?: listOf())
         })
-        getDataFromApi(null, null)
+
+        val fab = binding.fab
         fab.setOnClickListener {
             fabClickAction()
         }
+
+        getDataFromApi(null, null)
+
         return binding.root
     }
 
 
     private fun fabClickAction() {
+        // TODO A slight performance improvement would be to create the dialog only once and just show it on button click
         val builder = AlertDialog.Builder(requireContext())
         val layout = layoutInflater.inflate(R.layout.fragment_dialog_launches, null)
-         builder.setView(layout)
-         val dialogBinding = FragmentDialogLaunchesBinding.bind(layout)
-         val dialog = builder.create()
-         dialogBinding.launchesDialogButton.setOnClickListener {
-             dialogButtonAction(dialogBinding)
-             dialog.dismiss()
-         }
+        builder.setView(layout)
+        val dialogBinding = FragmentDialogLaunchesBinding.bind(layout)
+        val dialog = builder.create()
+        dialogBinding.launchesDialogButton.setOnClickListener {
+            dialogButtonAction(dialogBinding)
+            dialog.dismiss()
+        }
         dialog.show()
     }
 
+    /** podle zvolených checkboxů v dialogu vyfiltruje výsledky*/
     private fun dialogButtonAction(binding: FragmentDialogLaunchesBinding) {
-        var launchYear: Int? = null
-        var launchSuccess: Boolean? = null
-        binding.launchesDialogSuccessful.setOnCheckedChangeListener { buttonView, isChecked ->
-            binding.launchesDialogSuccessfulSwitch.isEnabled = isChecked
-        }
-
-        if (binding.launchesDialogSuccessful.isChecked) {
-            launchSuccess = binding.launchesDialogSuccessfulSwitch.isChecked
-        }
-
-        if (binding.launchesDialogYearCheckbox.isChecked) {
+        var year: Int? = null
+        try {
             val string = binding.launchesDialogYear.text.toString()
-            Log.i("Launch_String", string)
-            try {
-                launchYear = string.toInt()
-            } catch (e: NumberFormatException) {
-            }
+            year = string.toInt()
+        } catch (e: NumberFormatException) {
         }
+        val successful = binding.launchesDialogSuccessfulSwitch.isChecked
 
-        if (launchSuccess != null) {
-            if (launchYear != null) {
-                viewModel.getBySuccessFromYear(launchSuccess, launchYear)
-            } else viewModel.getBySuccess(launchSuccess)
-        } else if (launchYear != null) {
-            viewModel.getFromYear(launchYear)
-        } else viewModel.setDisplayable()
-
+        val launchYearChecked = binding.launchesDialogYearCheckbox.isChecked
+        val successChecked = binding.launchesDialogSuccessful.isChecked
+        when {
+            launchYearChecked && year != null && successChecked -> viewModel.getBySuccessFromYear(
+                successful,
+                year
+            )
+            launchYearChecked && year != null -> viewModel.getFromYear(year)
+            successChecked -> viewModel.getBySuccess(successful)
+            else -> viewModel.setDisplayable()
+        }
 
     }
 
     /** stáhne data ze SpaceXApi, uloží do databáze*/
-    private fun getDataFromApi(
-        launch_year: Int?,
-        launch_success: Boolean?
-    ) {
-        val request = ServiceBuilder.buildService(SpaceXEndpoints::class.java)
-        Log.i("getDataToAdapter", "number-$launch_year")
+    // TODO this should be in the viewmodel
+    private fun getDataFromApi(launch_year: Int?, launch_success: Boolean?) {
+        val request =
+            ServiceBuilder.buildService(SpaceXEndpoints::class.java) // TODO We definitely dont want to build the service every time we make an api call, also rename request to service
         val call = request.getLaunches(launch_year, launch_success)
         call.enqueue(object : Callback<List<LaunchesData>> {
             override fun onResponse(
@@ -116,6 +114,7 @@ class LaunchesFragment : Fragment() {
                 val responseListOfLaunches = response.body() ?: listOf()
                 /** vytvoří Launch (položka v databázi) z výstupu z retrofitu a uloží do databáze */
                 for (launchItem in responseListOfLaunches) {
+                    // TODO Couldn't launchItem and and Launch be the same data class? You can use annotations if you don't want to save everything.
                     val flightNumber = launchItem.flight_number.toInt()
                     val missionName = launchItem.mission_name
                     val upcoming = launchItem.upcoming
@@ -138,12 +137,12 @@ class LaunchesFragment : Fragment() {
                         detail,
                         wiki
                     )
-                    Log.i("call", launch.flight_number.toString() + launch.launchSite)
                     viewModel.addLaunch(launch)
                 }
+
                 binding.launchesProgressBar.visibility = View.GONE
-                Log.i("LaunchesFragment", responseListOfLaunches.toString())
             }
+
             override fun onFailure(call: Call<List<LaunchesData>>, t: Throwable) {
                 Toast.makeText(activity, "${t.message}", Toast.LENGTH_LONG).show()
             }
