@@ -125,8 +125,8 @@ class LaunchesFragment : Fragment() {
                     val rocket = launchItem.rocket.name
                     val success = launchItem.launch_success
                     val launchSite = launchItem.launch_site.name
-                    val detail = launchItem.detail
-                    val wiki = launchItem.wikipedia
+                    val detail = launchItem.detail ?: "-"
+                    val wiki = launchItem.wikipedia ?: "-"
                     val launch = Launch(
                         flightNumber,
                         missionName,
