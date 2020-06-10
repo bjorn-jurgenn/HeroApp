@@ -2,7 +2,8 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/Hero App.iml" filepath="$PROJECT_DIR$/Hero App.iml" group="Hero App" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/Hero App-app.iml" filepath="$PROJECT_DIR$/.idea/modules/app/Hero App-app.iml" group="Hero App/app" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/Hero_App.iml" filepath="$PROJECT_DIR$/.idea/modules/Hero_App.iml" group="Hero_App" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" group="Hero App/app" />
     </modules>
   </component>

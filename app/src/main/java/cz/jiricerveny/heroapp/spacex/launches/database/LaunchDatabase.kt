@@ -9,6 +9,8 @@ import androidx.room.RoomDatabase
 abstract class LaunchDatabase : RoomDatabase() {
     abstract val launchDatabaseDao: LaunchDatabaseDao
 
+    // TODO this seems too complicated. You could've just created the db in Application, which would make it singleton by default. Also, kotlin objects are singletons so maybe could've used that.
+
     companion object {
 
         @Volatile

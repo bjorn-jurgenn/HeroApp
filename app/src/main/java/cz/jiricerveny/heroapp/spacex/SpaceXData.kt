@@ -4,6 +4,7 @@ import com.google.gson.annotations.SerializedName
 
 data class LandPadData(
     val id: String,
+    // TODO, in general, data classes use camelCase. You can set a parameter in you json deserializer that will do that for you
     val full_name: String,
     val status: String,
     val location: LandPadLocation,
@@ -21,7 +22,8 @@ data class LandPadLocation(
     val longitude: String
 )
 
-data class LaunchesData(
+data class
+LaunchesData(
     val flight_number: String,
     val mission_name: String,
     val upcoming: Boolean,

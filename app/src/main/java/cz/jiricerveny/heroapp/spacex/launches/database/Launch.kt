@@ -4,7 +4,7 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 
-
+// TODO remove and moce annotations to LaunchItem
 @Entity(tableName = "launch_database")
 data class Launch(
     @PrimaryKey(autoGenerate = true)

@@ -31,10 +31,14 @@ class LandpadAdapter(private val listener: OnLandPadClickListener) :
     }
 }
 
+
+// TODO make inner class of launch adapter
 class LandPadsViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
     private val binding = LandpadItemLayoutBinding.bind(itemView)
 
     fun bind(landPad: LandPadData, clickListener: OnLandPadClickListener) {
+
+        // TODO binding apply
         binding.itemName.text = landPad.full_name
         binding.itemId.text = landPad.id
         binding.itemStatus.text = landPad.status

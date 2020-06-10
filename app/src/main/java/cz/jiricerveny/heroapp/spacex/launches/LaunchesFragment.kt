@@ -33,10 +33,10 @@ class LaunchesFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         binding = FragmentLaunchesBinding.inflate(layoutInflater, container, false)
-        val application = requireNotNull(this.activity).application
-        val dataSource = LaunchDatabase.getInstance(application).launchDatabaseDao
+        val application = requireNotNull(this.activity).application // TODO requireActivity().application
+        val dataSource = LaunchDatabase.getInstance(application).launchDatabaseDao // TODO probably no need to call this in onCreateView instead of fragment initialization
         val viewModelFactory = LaunchesViewModelFactory(dataSource, application)
-        viewModel = ViewModelProvider(this, viewModelFactory).get(LaunchesViewModel::class.java)
+        viewModel = ViewModelProvider(this, viewModelFactory).get(LaunchesViewModel::class.java) // TODO move to by ViewModels {}
         val fab = binding.fab
         val recyclerView = binding.launchesRecyclerView
         val adapter = LaunchesAdapter()
@@ -57,6 +57,7 @@ class LaunchesFragment : Fragment() {
 
 
     private fun fabClickAction() {
+        // TODO A slight performance improvement would be to create the dialog only once and just show it on button click
         val builder = AlertDialog.Builder(requireContext())
         val layout = layoutInflater.inflate(R.layout.fragment_dialog_launches, null)
          builder.setView(layout)
@@ -72,6 +73,8 @@ class LaunchesFragment : Fragment() {
     private fun dialogButtonAction(binding: FragmentDialogLaunchesBinding) {
         var launchYear: Int? = null
         var launchSuccess: Boolean? = null
+
+        // TODO this function is called only on launchesDialogButton.clicked but sets another listener?
         binding.launchesDialogSuccessful.setOnCheckedChangeListener { buttonView, isChecked ->
             binding.launchesDialogSuccessfulSwitch.isEnabled = isChecked
         }
@@ -97,15 +100,27 @@ class LaunchesFragment : Fragment() {
             viewModel.getFromYear(launchYear)
         } else viewModel.setDisplayable()
 
-
+        // TODO this whole thing seems unnecessarily complicated. Better:
+//        val launchYearChecked = binding.launchesDialogYearCheckbox.isChecked
+//        val successChecked = binding.launchesDialogSuccessful.isChecked
+//        val year = binding.launchesDialogYear.text.toString().toIntOrNull()
+//        val successful = binding.launchesDialogSuccessfulSwitch.isChecked
+//
+//        when {
+//            launchYearChecked && year != null && successChecked -> viewModel.getBySuccessFromYear(successChecked, year)
+//            launchYearChecked && year != null -> viewModel.getFromYear(year)
+//            successChecked -> viewModel.getBySuccess(successful)
+//            else -> viewModel.setDisplayable()
+//        }
     }
 
     /** stáhne data ze SpaceXApi, uloží do databáze*/
+    // TODO this should be in the viewmodel
     private fun getDataFromApi(
         launch_year: Int?,
         launch_success: Boolean?
     ) {
-        val request = ServiceBuilder.buildService(SpaceXEndpoints::class.java)
+        val request = ServiceBuilder.buildService(SpaceXEndpoints::class.java) // TODO We definitely dont want to build the service every time we make an api call, also rename request to service
         Log.i("getDataToAdapter", "number-$launch_year")
         val call = request.getLaunches(launch_year, launch_success)
         call.enqueue(object : Callback<List<LaunchesData>> {
@@ -116,6 +131,7 @@ class LaunchesFragment : Fragment() {
                 val responseListOfLaunches = response.body() ?: listOf()
                 /** vytvoří Launch (položka v databázi) z výstupu z retrofitu a uloží do databáze */
                 for (launchItem in responseListOfLaunches) {
+                    // TODO Couldn't launchItem and and Launch be the same data class? You can use annotations if you don't want to save everything.
                     val flightNumber = launchItem.flight_number.toInt()
                     val missionName = launchItem.mission_name
                     val upcoming = launchItem.upcoming

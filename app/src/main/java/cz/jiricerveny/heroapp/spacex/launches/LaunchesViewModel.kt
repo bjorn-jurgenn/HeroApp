@@ -12,6 +12,8 @@ import kotlinx.coroutines.*
 
 class LaunchesViewModel(private val database: LaunchDatabaseDao, application: Application) :
     AndroidViewModel(application) {
+
+    // TODO why var? Always prefer val over var unless absolutely necessary
     private var viewModelJob = Job()
 
     private val uiScope = CoroutineScope(Dispatchers.Main + viewModelJob)
@@ -21,10 +23,12 @@ class LaunchesViewModel(private val database: LaunchDatabaseDao, application: Ap
         get() = _displayableLaunches
 
     init {
+        // TODO can be moved to constructor (this was necessary for older livedata versions)
         _displayableLaunches.value = listOf()
     }
 
     fun setDisplayable() {
+        // TODO slight code improvement could be done by viewmodel inheriting CoroutineScope and then calling launch directly
         uiScope.launch {
             val result = displayAll()
             Log.i("setDisplayable", result.toString())
@@ -33,12 +37,14 @@ class LaunchesViewModel(private val database: LaunchDatabaseDao, application: Ap
     }
 
     private suspend fun displayAll(): List<Launch> {
+        // TODO Room supports coroutines directly, convert this to "return database.getList()" and "suspend fun getList(): List<Launch>"
         return withContext(Dispatchers.IO) {
             database.getList()
         }
     }
 
     private suspend fun insert(launch: Launch) {
+        // TODO same as 40
         return withContext(Dispatchers.IO) {
             database.insert(launch)
         }
@@ -52,6 +58,7 @@ class LaunchesViewModel(private val database: LaunchDatabaseDao, application: Ap
     }
 
     private suspend fun displayDataFromYear(year: Int): List<Launch> {
+        // TODO same as 40
         return withContext(Dispatchers.IO) {
             database.getFromYear(year)
         }

@@ -5,10 +5,11 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import cz.jiricerveny.heroapp.databinding.LandpadDetailLayoutBinding
 
-
+// TODO pass index properly. App would crash on configuration change
 class LandPadDetailFragment(private val index: Int) : Fragment() {
     private lateinit var binding: LandpadDetailLayoutBinding
     private lateinit var viewModel: LandPadViewModel
@@ -33,6 +34,15 @@ class LandPadDetailFragment(private val index: Int) : Fragment() {
         binding.itemRegion.text = viewModel.landPads.value?.get(index)?.location?.region ?: ""
         binding.itemDetails.text = viewModel.landPads.value?.get(index)?.details ?: ""
         binding.itemButton.setOnClickListener { parentFragmentManager.popBackStack() }
+
+        // TODO The above would display incorrect data when opening before data loads properly. better:
+        viewModel.landPads.observe(viewLifecycleOwner, Observer {landpads ->
+            binding.apply {
+                itemName.text = landpads[index].full_name
+                //...
+            }
+        })
+
         return binding.root
     }
 }

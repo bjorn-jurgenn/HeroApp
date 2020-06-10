@@ -35,14 +35,14 @@ class LandPadsFragment : Fragment(),
 
 
         val recyclerView = binding.landpadsRecyclerView
-        val adapter = LandpadAdapter(this)
+        val adapter = LandpadAdapter(this) // TODO I personaly don't like this style, baucause it makes the listener hard to find in class. ::onItemClicked and ::onLocationClicked would be more clear
         recyclerView.apply {
             layoutManager = LinearLayoutManager(activity)
             this.adapter = adapter
             adapter.update(viewModel.landPads.value ?: listOf())
         }
 
-        val request = ServiceBuilder.buildService(SpaceXEndpoints::class.java)
+        val request = ServiceBuilder.buildService(SpaceXEndpoints::class.java) // TODO again, building the whole service for single request
         val call = request.getLandPads()
 
         call.enqueue(object : Callback<List<LandPadData>> {
@@ -52,7 +52,7 @@ class LandPadsFragment : Fragment(),
             ) {
                 val listOfResults = response.body() ?: listOf()
                 viewModel.update(listOfResults)
-                (recyclerView.adapter as LandpadAdapter).update(
+                (recyclerView.adapter as LandpadAdapter).update( // TODO you could simply use the adapter variable. Also, value should never be null if you initialize it properly
                     viewModel.landPads.value ?: listOf()
                 )
                 binding.landpadsprogressBar.visibility = View.GONE
