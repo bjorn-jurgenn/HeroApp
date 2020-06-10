@@ -33,6 +33,7 @@ class LandPadsFragment : Fragment(),
         binding = FragmentLandpadsBinding.inflate(layoutInflater, container, false)
         viewModel = ViewModelProvider(requireActivity()).get(LandPadViewModel::class.java)
 
+
         val recyclerView = binding.landpadsRecyclerView
         val adapter = LandpadAdapter(this)
         recyclerView.apply {

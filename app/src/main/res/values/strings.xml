@@ -67,5 +67,6 @@
     <string name="only_successful">only successful</string>
     <string name="launch_year">launch year</string>
     <string name="_2020">2020</string>
+    <string name="successful_failed">successful / failed</string>
 
 </resources>
