@@ -30,8 +30,8 @@ data class LaunchesData(
     val rocket: LaunchRocket,
     val launch_success: Boolean?,
     val launch_site: LaunchSite,
-    val detail: String,
-    val wikipedia: String
+    val detail: String?,
+    val wikipedia: String?
 )
 
 data class LaunchRocket(

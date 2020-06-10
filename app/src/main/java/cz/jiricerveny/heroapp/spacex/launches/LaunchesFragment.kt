@@ -1,6 +1,5 @@
 package cz.jiricerveny.heroapp.spacex.launches
 
-import android.annotation.SuppressLint
 import android.app.AlertDialog
 import android.os.Bundle
 import android.util.Log
