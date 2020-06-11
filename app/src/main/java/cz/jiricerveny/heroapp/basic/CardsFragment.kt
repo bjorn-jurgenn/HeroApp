@@ -1,4 +1,4 @@
-package cz.jiricerveny.heroapp
+package cz.jiricerveny.heroapp.basic
 
 import android.os.Bundle
 import android.view.LayoutInflater

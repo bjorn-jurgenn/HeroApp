@@ -1,4 +1,4 @@
-package cz.jiricerveny.heroapp
+package cz.jiricerveny.heroapp.basic
 
 import android.app.Dialog
 import android.content.Intent
@@ -9,6 +9,9 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
+import cz.jiricerveny.heroapp.ACTIVITY_RESULT
+import cz.jiricerveny.heroapp.EXTRA_MESSAGE
+import cz.jiricerveny.heroapp.R
 import cz.jiricerveny.heroapp.databinding.FragmentCustomBinding
 import cz.jiricerveny.heroapp.databinding.FragmentDialogsBinding
 
@@ -68,7 +71,7 @@ class DialogsFragment : Fragment() {
     }
 
     private fun alertDialogView(title: String) {
-        val builder = AlertDialog.Builder(context!!)
+        val builder = AlertDialog.Builder(requireContext())
         builder.setTitle(title)
             .setMessage("Hello prefix will be added")
             .setPositiveButton(android.R.string.yes) { _, _ ->
@@ -85,7 +88,7 @@ class DialogsFragment : Fragment() {
      */
     private fun showDialogNr2() {
         if (resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
-            val builder = AlertDialog.Builder(context!!)
+            val builder = AlertDialog.Builder(requireContext())
             val customLayout = layoutInflater.inflate(R.layout.fragment_custom, null)
             builder.setView(customLayout)
             val dialogsBinding = FragmentCustomBinding.bind(customLayout)
@@ -99,7 +102,10 @@ class DialogsFragment : Fragment() {
             // show the fragment fullscreen
             val view = layoutInflater.inflate(R.layout.fragment_custom, null)
             val dialog =
-                Dialog(context!!, android.R.style.Theme_DeviceDefault_Light_NoActionBar_Fullscreen)
+                Dialog(
+                    requireContext(),
+                    android.R.style.Theme_DeviceDefault_Light_NoActionBar_Fullscreen
+                )
             dialog.setContentView(view)
             val dialogsBinding = FragmentCustomBinding.bind(view)
             dialogsBinding.buttonCustomDialog.setOnClickListener {

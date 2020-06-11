@@ -1,19 +1,17 @@
 package cz.jiricerveny.heroapp.spacex.launches
 
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import cz.jiricerveny.heroapp.R
 import cz.jiricerveny.heroapp.databinding.LaunchItemLayoutBinding
-import cz.jiricerveny.heroapp.spacex.LaunchesData
 import cz.jiricerveny.heroapp.spacex.launches.database.Launch
 import java.time.ZoneId
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 
-class LaunchesAdapter : RecyclerView.Adapter<LaunchesViewHolder>() {
+class LaunchesAdapter : RecyclerView.Adapter<LaunchesAdapter.LaunchesViewHolder>() {
     private val launches = mutableListOf<Launch>()
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): LaunchesViewHolder {
@@ -34,28 +32,33 @@ class LaunchesAdapter : RecyclerView.Adapter<LaunchesViewHolder>() {
         notifyDataSetChanged()
     }
 
-}
 
-// TODO Should be inner class of adapter as it is not likely to be shared with other adapter
-class LaunchesViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-    private val binding = LaunchItemLayoutBinding.bind(itemView)
+    inner class LaunchesViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+        private val binding = LaunchItemLayoutBinding.bind(itemView)
 
-    fun bind(launch: Launch) {
-        binding.itemName.text = launch.missionName
-        binding.itemFlight.text = launch.flight_number.toString()
-        binding.itemYear.text = launch.launchYear.toString()
-        when {
-            launch.upcoming -> binding.itemStatus.text = "upcoming"
-            launch.launchSuccess == true -> binding.itemStatus.text = "successful"
-            else -> binding.itemStatus.text = "failure"
+        fun bind(launch: Launch) {
+            binding.apply {
+
+                itemName.text = launch.missionName
+                itemFlight.text = launch.flight_number.toString()
+                itemYear.text = launch.launchYear.toString()
+                when {
+                    launch.upcoming -> itemStatus.text = "upcoming"
+                    launch.launchSuccess == true -> itemStatus.text = "successful"
+                    else -> itemStatus.text = "failure"
+                }
+                itemRocketName.text = launch.rocketName
+                itemSiteName.text = launch.launchSite
+
+                val zonedDateTime = ZonedDateTime.parse(launch.launchDateLocal)
+                    .withZoneSameInstant(ZoneId.of("Europe/Paris"))
+                val localDateTime =
+                    zonedDateTime.format(DateTimeFormatter.ofPattern("d.M.Y HH:mm:ss z"))
+
+                itemLaunchDate.text = localDateTime
+            }
+
         }
-        binding.itemRocketName.text = launch.rocketName
-        binding.itemSiteName.text = launch.launchSite
-
-        val zonedDateTime = ZonedDateTime.parse(launch.launchDateLocal)
-            .withZoneSameInstant(ZoneId.of("Europe/Paris"))
-        val localDateTime = zonedDateTime.format(DateTimeFormatter.ofPattern("d.M.Y HH:mm:ss z"))
-
-        binding.itemLaunchDate.text = localDateTime
     }
+
 }

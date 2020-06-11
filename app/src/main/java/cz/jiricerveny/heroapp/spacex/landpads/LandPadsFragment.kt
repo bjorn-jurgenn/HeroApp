@@ -22,7 +22,7 @@ import retrofit2.Response
 
 
 class LandPadsFragment : Fragment(),
-    OnLandPadClickListener {
+    LandpadAdapter.OnLandPadClickListener {
     private lateinit var binding: FragmentLandpadsBinding
     private lateinit var viewModel: LandPadViewModel
 
@@ -43,9 +43,7 @@ class LandPadsFragment : Fragment(),
             adapter.update(viewModel.landPads.value ?: listOf())
         }
 
-        val request =
-            ServiceBuilder.buildService(SpaceXEndpoints::class.java) // TODO again, building the whole service for single request
-        val call = request.getLandPads()
+        val call = ServiceBuilder.buildService(SpaceXEndpoints::class.java).getLandPads()
 
         call.enqueue(object : Callback<List<LandPadData>> {
             override fun onResponse(

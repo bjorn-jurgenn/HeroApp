@@ -4,13 +4,16 @@ import com.google.gson.annotations.SerializedName
 
 data class LandPadData(
     val id: String,
-    // TODO, in general, data classes use camelCase. You can set a parameter in you json deserializer that will do that for you
-    val full_name: String,
+    @SerializedName("full_name")
+    val name: String,
     val status: String,
     val location: LandPadLocation,
-    val landing_type: String,
-    val successful_landings: Int,
-    val attempted_landings: Int,
+    @SerializedName("landing_type")
+    val type: String,
+    @SerializedName("successful_landings")
+    val successfulLandings: Int,
+    @SerializedName("attempted_landings")
+    val totalLandings: Int,
     val wikipedia: String,
     val details: String
 )
@@ -24,14 +27,20 @@ data class LandPadLocation(
 
 data class
 LaunchesData(
-    val flight_number: String,
-    val mission_name: String,
+    @SerializedName("flight_number")
+    val flightNumber: String,
+    @SerializedName("mission_name")
+    val missionName: String,
     val upcoming: Boolean,
-    val launch_year: Int,
-    val launch_date_local: String,
+    @SerializedName("launch_year")
+    val launchYear: Int,
+    @SerializedName("launch_date_local")
+    val launchDate: String,
     val rocket: LaunchRocket,
-    val launch_success: Boolean?,
-    val launch_site: LaunchSite,
+    @SerializedName("launch_success")
+    val success: Boolean?,
+    @SerializedName("launch_site")
+    val launchSite: LaunchSite,
     val detail: String?,
     val wikipedia: String?
 )

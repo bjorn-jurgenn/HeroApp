@@ -1,7 +1,9 @@
 package cz.jiricerveny.heroapp.spacex.launches
 
 import android.app.AlertDialog
+import android.content.DialogInterface
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -51,29 +53,51 @@ class LaunchesFragment : Fragment() {
             adapter.update(it ?: listOf())
         })
 
-        val fab = binding.fab
-        fab.setOnClickListener {
-            fabClickAction()
-        }
+        viewModel.progressBarVisible.observe(viewLifecycleOwner, Observer {
+            if (it) binding.launchesProgressBar.visibility = View.VISIBLE
+            else binding.launchesProgressBar.visibility = View.GONE
+        })
 
-        getDataFromApi(null, null)
-
-        return binding.root
-    }
-
-
-    private fun fabClickAction() {
-        // TODO A slight performance improvement would be to create the dialog only once and just show it on button click
-        val builder = AlertDialog.Builder(requireContext())
-        val layout = layoutInflater.inflate(R.layout.fragment_dialog_launches, null)
-        builder.setView(layout)
-        val dialogBinding = FragmentDialogLaunchesBinding.bind(layout)
-        val dialog = builder.create()
-        dialogBinding.launchesDialogButton.setOnClickListener {
-            dialogButtonAction(dialogBinding)
+        val filterBuilder = AlertDialog.Builder(requireContext())
+        val filterLayout = layoutInflater.inflate(R.layout.fragment_dialog_launches, null)
+        filterBuilder.setView(filterLayout)
+        val filterDialogBinding = FragmentDialogLaunchesBinding.bind(filterLayout)
+        val dialog = filterBuilder.create()
+        filterDialogBinding.launchesDialogButton.setOnClickListener {
+            dialogButtonAction(filterDialogBinding)
             dialog.dismiss()
         }
-        dialog.show()
+
+        val fab = binding.fab
+        fab.setOnClickListener {
+            dialog.show()
+        }
+
+        val service =
+            ServiceBuilder.buildService(SpaceXEndpoints::class.java)
+        val call = service.getLaunches(null, null)
+
+        val reloadBuilder = AlertDialog.Builder(requireContext())
+        reloadBuilder.setMessage("Reload")
+            .setPositiveButton("Yes", DialogInterface.OnClickListener { _, _ ->
+                viewModel.getDataFromApi(call)
+            })
+            .setNegativeButton("No", DialogInterface.OnClickListener { _, _ ->
+                Toast.makeText(requireContext(), "using offline data", Toast.LENGTH_SHORT).show()
+            })
+        val reloadDialog = reloadBuilder.create()
+
+        viewModel.failure.observe(viewLifecycleOwner, Observer {
+            if (it) {
+                Toast.makeText(activity, viewModel.message.value, Toast.LENGTH_LONG).show()
+                viewModel.onFailureEnded()
+                reloadDialog.show()
+            }
+        })
+
+        viewModel.getDataFromApi(call)
+
+        return binding.root
     }
 
     /** podle zvolených checkboxů v dialogu vyfiltruje výsledky*/
@@ -100,52 +124,5 @@ class LaunchesFragment : Fragment() {
 
     }
 
-    /** stáhne data ze SpaceXApi, uloží do databáze*/
-    // TODO this should be in the viewmodel
-    private fun getDataFromApi(launch_year: Int?, launch_success: Boolean?) {
-        val request =
-            ServiceBuilder.buildService(SpaceXEndpoints::class.java) // TODO We definitely dont want to build the service every time we make an api call, also rename request to service
-        val call = request.getLaunches(launch_year, launch_success)
-        call.enqueue(object : Callback<List<LaunchesData>> {
-            override fun onResponse(
-                call: Call<List<LaunchesData>>,
-                response: Response<List<LaunchesData>>
-            ) {
-                val responseListOfLaunches = response.body() ?: listOf()
-                /** vytvoří Launch (položka v databázi) z výstupu z retrofitu a uloží do databáze */
-                for (launchItem in responseListOfLaunches) {
-                    // TODO Couldn't launchItem and and Launch be the same data class? You can use annotations if you don't want to save everything.
-                    val flightNumber = launchItem.flight_number.toInt()
-                    val missionName = launchItem.mission_name
-                    val upcoming = launchItem.upcoming
-                    val launchYear = launchItem.launch_year
-                    val launchDate = launchItem.launch_date_local
-                    val rocket = launchItem.rocket.name
-                    val success = launchItem.launch_success
-                    val launchSite = launchItem.launch_site.name
-                    val detail = launchItem.detail ?: "-"
-                    val wiki = launchItem.wikipedia ?: "-"
-                    val launch = Launch(
-                        flightNumber,
-                        missionName,
-                        upcoming,
-                        launchYear,
-                        launchDate,
-                        rocket,
-                        success,
-                        launchSite,
-                        detail,
-                        wiki
-                    )
-                    viewModel.addLaunch(launch)
-                }
 
-                binding.launchesProgressBar.visibility = View.GONE
-            }
-
-            override fun onFailure(call: Call<List<LaunchesData>>, t: Throwable) {
-                Toast.makeText(activity, "${t.message}", Toast.LENGTH_LONG).show()
-            }
-        })
-    }
 }

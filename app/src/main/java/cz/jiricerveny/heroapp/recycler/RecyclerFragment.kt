@@ -59,7 +59,7 @@ class RecyclerFragment : Fragment(), OnItemClickListener {
 
         val fab = binding.fab
         fab.setOnClickListener {
-            fabClickAction(adapter)
+            fabClickAction()
         }
         // Inflate the layout for this fragment
         return binding.root
@@ -82,7 +82,7 @@ class RecyclerFragment : Fragment(), OnItemClickListener {
         Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
     }
 
-    private fun fabClickAction(adapter: ListAdapter) {
+    private fun fabClickAction() {
         val builder = AlertDialog.Builder(requireContext())
         val layout = layoutInflater.inflate(R.layout.fragment_dialog_two_edit_text, null)
         builder.setView(layout)

@@ -15,7 +15,7 @@
         android:theme="@style/AppTheme">
 
         <activity
-            android:name=".ThirdDialogActivity"
+            android:name=".basic.ThirdDialogActivity"
             android:theme="@style/AppTheme.ThirdDialog" />
 
         <activity

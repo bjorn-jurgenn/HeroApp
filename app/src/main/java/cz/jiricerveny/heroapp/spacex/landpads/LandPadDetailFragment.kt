@@ -21,28 +21,23 @@ class LandPadDetailFragment(private val index: Int) : Fragment() {
         binding = LandpadDetailLayoutBinding.inflate(layoutInflater, container, false)
         viewModel = ViewModelProvider(requireActivity()).get(LandPadViewModel::class.java)
 
-        binding.itemName.text = viewModel.landPads.value?.get(index)?.full_name ?: ""
-        binding.itemId.text = viewModel.landPads.value?.get(index)?.id ?: ""
-        binding.itemStatus.text = viewModel.landPads.value?.get(index)?.status ?: ""
-        val successful = viewModel.landPads.value?.get(index)?.successful_landings ?: 0
-        val total = viewModel.landPads.value?.get(index)?.attempted_landings ?: 0
-        binding.itemSuccessful.text = successful.toString()
-        binding.itemLandings.text = total.toString()
-        if (successful == 0) binding.itemPercentage.text = "0"
-        else binding.itemPercentage.text = ((successful * 100) / total).toString()
-        binding.itemLocation.text = viewModel.landPads.value?.get(index)?.location?.name ?: ""
-        binding.itemRegion.text = viewModel.landPads.value?.get(index)?.location?.region ?: ""
-        binding.itemDetails.text = viewModel.landPads.value?.get(index)?.details ?: ""
-        binding.itemButton.setOnClickListener { parentFragmentManager.popBackStack() }
-
-        // TODO The above would display incorrect data when opening before data loads properly. better:
         viewModel.landPads.observe(viewLifecycleOwner, Observer { landpads ->
             binding.apply {
-                itemName.text = landpads[index].full_name
-                //...
+                itemName.text = landpads[index].name
+                itemId.text = landpads[index].id
+                itemStatus.text = landpads[index].status
+                val successful = landpads[index].successfulLandings
+                val total = landpads[index].totalLandings
+                itemSuccessful.text = successful.toString()
+                itemLandings.text = total.toString()
+                if (successful == 0) itemPercentage.text = "0"
+                else itemPercentage.text = ((successful * 100) / total).toString()
+                itemLocation.text = landpads[index].location.name
+                itemRegion.text = landpads[index].location.region
+                itemDetails.text = landpads[index].details
+                itemButton.setOnClickListener { parentFragmentManager.popBackStack() }
             }
         })
-
         return binding.root
     }
 }

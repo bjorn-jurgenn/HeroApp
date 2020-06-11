@@ -1,4 +1,4 @@
-package cz.jiricerveny.heroapp
+package cz.jiricerveny.heroapp.basic
 
 
 import android.app.AlertDialog
@@ -8,6 +8,7 @@ import android.os.Bundle
 import android.text.InputType
 import android.widget.EditText
 import androidx.fragment.app.DialogFragment
+import cz.jiricerveny.heroapp.R
 
 /**
  * Fragment used to display dialog which edits username displayed in NavigationDrawer

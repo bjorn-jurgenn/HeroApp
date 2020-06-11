@@ -1,5 +1,6 @@
 package cz.jiricerveny.heroapp.spacex
 
+import cz.jiricerveny.heroapp.spacex.launches.database.Launch
 import retrofit2.Call
 import retrofit2.http.GET
 import retrofit2.http.Query

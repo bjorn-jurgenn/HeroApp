@@ -10,7 +10,7 @@ import cz.jiricerveny.heroapp.databinding.LandpadItemLayoutBinding
 import cz.jiricerveny.heroapp.spacex.LandPadData
 
 class LandpadAdapter(private val listener: OnLandPadClickListener) :
-    RecyclerView.Adapter<LandPadsViewHolder>() {
+    RecyclerView.Adapter<LandpadAdapter.LandPadsViewHolder>() {
     private val landPads = mutableListOf<LandPadData>()
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): LandPadsViewHolder {
         val view =
@@ -29,38 +29,37 @@ class LandpadAdapter(private val listener: OnLandPadClickListener) :
         landPads.addAll(list)
         notifyDataSetChanged()
     }
-}
 
+    inner class LandPadsViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+        private val binding = LandpadItemLayoutBinding.bind(itemView)
 
-// TODO make inner class of launch adapter
-class LandPadsViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-    private val binding = LandpadItemLayoutBinding.bind(itemView)
+        fun bind(landPad: LandPadData, clickListener: OnLandPadClickListener) {
 
-    fun bind(landPad: LandPadData, clickListener: OnLandPadClickListener) {
-
-        // TODO binding apply
-        binding.itemName.text = landPad.full_name
-        binding.itemId.text = landPad.id
-        binding.itemStatus.text = landPad.status
-        binding.itemSuccessful.text = landPad.successful_landings.toString()
-        binding.itemLandings.text = landPad.attempted_landings.toString()
-        if (landPad.attempted_landings == 0) binding.itemPercentage.text = "0"
-        else binding.itemPercentage.text =
-            ((landPad.successful_landings * 100) / landPad.attempted_landings).toString()
-        binding.itemLocation.text = landPad.location.name
-        binding.itemLocation.setOnClickListener {
-            clickListener.onLocationClicked(
-                landPad.location.latitude, landPad.location.longitude
-            )
+            binding.apply {
+                itemName.text = landPad.name
+                itemId.text = landPad.id
+                itemStatus.text = landPad.status
+                itemSuccessful.text = landPad.successfulLandings.toString()
+                itemLandings.text = landPad.totalLandings.toString()
+                if (landPad.totalLandings == 0) itemPercentage.text = "0"
+                else itemPercentage.text =
+                    ((landPad.totalLandings * 100) / landPad.totalLandings).toString()
+                itemLocation.text = landPad.location.name
+                itemLocation.setOnClickListener {
+                    clickListener.onLocationClicked(
+                        landPad.location.latitude, landPad.location.longitude
+                    )
+                }
+                itemRegion.text = landPad.location.region
+                itemLocation.paintFlags = Paint.UNDERLINE_TEXT_FLAG
+                itemLayout.setOnClickListener { clickListener.onItemClicked(landPad) }
+            }
         }
-        binding.itemRegion.text = landPad.location.region
-        binding.itemLocation.paintFlags = Paint.UNDERLINE_TEXT_FLAG
-        binding.itemLayout.setOnClickListener { clickListener.onItemClicked(landPad) }
-//        binding.itemDetails.text = landPad.details
+    }
+
+    interface OnLandPadClickListener {
+        fun onItemClicked(landPad: LandPadData)
+        fun onLocationClicked(lat: String, long: String)
     }
 }
 
-interface OnLandPadClickListener {
-    fun onItemClicked(landPad: LandPadData)
-    fun onLocationClicked(lat: String, long: String)
-}

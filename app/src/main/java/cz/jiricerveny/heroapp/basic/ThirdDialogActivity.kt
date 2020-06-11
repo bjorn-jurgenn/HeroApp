@@ -1,4 +1,4 @@
-package cz.jiricerveny.heroapp
+package cz.jiricerveny.heroapp.basic
 
 import android.app.Activity
 import android.content.Intent
@@ -6,6 +6,9 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintSet
 import androidx.transition.TransitionManager
+import cz.jiricerveny.heroapp.ACTIVITY_RESULT
+import cz.jiricerveny.heroapp.EXTRA_MESSAGE
+import cz.jiricerveny.heroapp.R
 import cz.jiricerveny.heroapp.databinding.ActivityThirdDialogBinding
 
 /**
@@ -44,7 +47,10 @@ class ThirdDialogActivity : AppCompatActivity() {
      */
     private fun animateToKeyframeTwo() {
         val constraint2 = ConstraintSet()
-        constraint2.clone(this, R.layout.activity_third_dialog_final)
+        constraint2.clone(
+            this,
+            R.layout.activity_third_dialog_final
+        )
         TransitionManager.beginDelayedTransition(binding.conLay)
         constraint2.applyTo(binding.conLay)
     }

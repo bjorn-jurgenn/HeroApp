@@ -1,4 +1,4 @@
-package cz.jiricerveny.heroapp
+package cz.jiricerveny.heroapp.basic
 
 
 import android.graphics.drawable.AnimationDrawable
@@ -7,6 +7,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import cz.jiricerveny.heroapp.R
 import cz.jiricerveny.heroapp.databinding.FragmentAnimationDrawablesBinding
 
 

@@ -17,6 +17,10 @@ import cz.jiricerveny.heroapp.databinding.NavHeaderBinding
 import cz.jiricerveny.heroapp.recycler.RecyclerFragment
 import cz.jiricerveny.heroapp.spacex.landpads.LandPadsFragment
 import cz.jiricerveny.heroapp.spacex.launches.LaunchesFragment
+import cz.jiricerveny.heroapp.basic.AnimationDrawablesFragment
+import cz.jiricerveny.heroapp.basic.CardsFragment
+import cz.jiricerveny.heroapp.basic.ChangeUsernameDialogFragment
+import cz.jiricerveny.heroapp.basic.DialogsFragment
 
 const val EXTRA_MESSAGE = "cz.jiricerveny.aboutme.MESSAGE"
 const val ACTIVITY_RESULT = "cz.jiricerveny.aboutme.RESULT"
@@ -73,7 +77,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             R.id.launches -> position = 6
 
             R.id.edit_username -> {
-                val dialog = ChangeUsernameDialogFragment()
+                val dialog =
+                    ChangeUsernameDialogFragment()
                 dialog.show(supportFragmentManager, "Change Username")
                 Toast.makeText(this, "Change username clicked", Toast.LENGTH_SHORT).show()
             }
@@ -101,15 +106,18 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 changeFragmentTo(mainFragment)
             }
             1 -> {
-                val cardsFragment = CardsFragment()
+                val cardsFragment =
+                    CardsFragment()
                 changeFragmentTo(cardsFragment)
             }
             2 -> {
-                val dialogsFragment = DialogsFragment()
+                val dialogsFragment =
+                    DialogsFragment()
                 changeFragmentTo(dialogsFragment)
             }
             3 -> {
-                val animationDrawableFragment = AnimationDrawablesFragment()
+                val animationDrawableFragment =
+                    AnimationDrawablesFragment()
                 changeFragmentTo(animationDrawableFragment)
             }
             4 -> {
