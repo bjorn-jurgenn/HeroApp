@@ -13,7 +13,7 @@ interface LaunchDatabaseDao {
     suspend fun insert(launch: Launch)
 
     @Query("SELECT * FROM launch_database")
-    suspend fun getList(): List<Launch>
+    fun getList(): List<Launch>
 
     @Query("SELECT * FROM launch_database WHERE launch_success = :key")
     suspend fun getBySuccess(key: Boolean): List<Launch>

@@ -1,7 +1,9 @@
 
 package cz.jiricerveny.heroapp.spacex.launches
 
+import android.annotation.SuppressLint
 import android.os.Handler
+import android.os.HandlerThread
 import android.os.Message
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -24,13 +26,22 @@ data class Loaded(val list: List<Launch>): LaunchesState()
 object Loading: LaunchesState()
 object Failure: LaunchesState()
  */
-
+private const val TAG = "LaunchesViewModel"
 class LaunchesViewModel(
-    private val database: LaunchDatabaseDao, private val call: Call<List<LaunchesData>>
+    private val database: LaunchDatabaseDao,
+    private val call: Call<List<LaunchesData>>,
+    private val handlerThread: LaunchesHandlerThread
 ) : ViewModel(), CoroutineScope {
     override val coroutineContext: CoroutineContext
         get() = CoroutineScope(Dispatchers.Main + Job()).coroutineContext
 
+    @SuppressLint("HandlerLeak")
+    private val handler = object : Handler() {
+        override fun handleMessage(msg: Message) {
+            super.handleMessage(msg)
+            _displayableLaunches.value = msg.obj as List<Launch>
+        }
+    }
 
     private val _displayableLaunches: MutableLiveData<List<Launch>> = MutableLiveData()
     val displayableLaunches: LiveData<List<Launch>>
@@ -54,16 +65,16 @@ class LaunchesViewModel(
     }
 
     fun setDisplayable() {
-        launch {
-            val result = displayAll()
-            _displayableLaunches.value = result
-        }
-
+        displayAll()
     }
 
-    private suspend fun displayAll(): List<Launch> {
-        return database.getList()
-
+    private fun displayAll() {
+        handlerThread.getHandler().post {
+            val list = database.getList()
+            val msg = Message.obtain()
+            msg.obj = list
+            handler.sendMessage(msg)
+        }
     }
 
     private suspend fun insert(launch: Launch) {

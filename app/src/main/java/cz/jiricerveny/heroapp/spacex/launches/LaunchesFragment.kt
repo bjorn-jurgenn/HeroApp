@@ -2,6 +2,8 @@ package cz.jiricerveny.heroapp.spacex.launches
 
 import android.app.AlertDialog
 import android.os.Bundle
+import android.os.Handler
+import android.os.HandlerThread
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -18,10 +20,12 @@ import cz.jiricerveny.heroapp.databinding.FragmentLaunchesBinding
 
 class LaunchesFragment : Fragment() {
     private lateinit var binding: FragmentLaunchesBinding
+    private val handlerThread = LaunchesHandlerThread()
     private val viewModel: LaunchesViewModel by viewModels {
         LaunchesViewModelFactory(
             (requireActivity().application as HeroApp).db.launchDatabaseDao,
-            (requireActivity().application as HeroApp).service
+            (requireActivity().application as HeroApp).service,
+            handlerThread
         )
     }
 
@@ -33,6 +37,7 @@ class LaunchesFragment : Fragment() {
         binding = FragmentLaunchesBinding.inflate(layoutInflater, container, false)
         val filterDialog = buildFilterDialog()
         val reloadDialog = buildReloadDialog()
+        handlerThread.start()
 
         val recyclerView = binding.launchesRecyclerView
         val adapter = LaunchesAdapter()
@@ -116,5 +121,8 @@ class LaunchesFragment : Fragment() {
         return builder.create()
     }
 
-
+    override fun onDestroy() {
+        super.onDestroy()
+        handlerThread.quit()
+    }
 }
