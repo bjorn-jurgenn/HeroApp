@@ -1,16 +1,14 @@
 package cz.jiricerveny.heroapp.spacex.launches
 
-import android.os.HandlerThread
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import cz.jiricerveny.heroapp.spacex.LaunchesData
-import cz.jiricerveny.heroapp.spacex.SpaceXEndpoints
+import cz.jiricerveny.heroapp.spacex.launches.database.Launch
 import cz.jiricerveny.heroapp.spacex.launches.database.LaunchDatabaseDao
 import retrofit2.Call
 
 class LaunchesViewModelFactory(
     private val dataSource: LaunchDatabaseDao,
-    private val service: Call<List<LaunchesData>>,
+    private val service: Call<List<Launch>>,
     private val handlerThread: LaunchesHandlerThread
 ) : ViewModelProvider.Factory {
     @Suppress("unchecked_cast")

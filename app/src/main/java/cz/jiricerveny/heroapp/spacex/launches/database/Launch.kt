@@ -5,6 +5,7 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.google.gson.annotations.SerializedName
 
+
 // TODO remove and move annotations to LaunchItem
 @Entity(tableName = "launch_database")
 data class Launch(
@@ -21,18 +22,32 @@ data class Launch(
     @SerializedName("launch_date_local")
     @ColumnInfo(name = "launch_date_local")
     val launchDateLocal: String,
-    @SerializedName("rocket_name")
-    @ColumnInfo(name = "rocket_name")
-    val rocketName: String,
+    @SerializedName("rocket")
+    @ColumnInfo(name = "rocket")
+    val rocket: LaunchRocket,
     @SerializedName("launch_success")
     @ColumnInfo(name = "launch_success")
     val launchSuccess: Boolean?,
     @SerializedName("launch_site")
     @ColumnInfo(name = "launch_site")
-    val launchSite: String,
+    val launchSite: LaunchSite,
     @SerializedName("detail")
     @ColumnInfo(name = "detail")
     val detail: String?,
     @ColumnInfo(name = "wikipedia")
     val wikipedia: String?
+)
+
+data class LaunchRocket(
+    @SerializedName("rocket_id")
+    val id: String,
+    @SerializedName("rocket_name")
+    val name: String,
+    @SerializedName("rocket_type")
+    val type: String
+)
+
+data class LaunchSite(
+    @SerializedName("site_name_long")
+    val name: String
 )

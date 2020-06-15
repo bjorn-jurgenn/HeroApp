@@ -2,8 +2,7 @@ package cz.jiricerveny.heroapp.spacex.launches
 
 import android.app.AlertDialog
 import android.os.Bundle
-import android.os.Handler
-import android.os.HandlerThread
+
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -124,5 +123,6 @@ class LaunchesFragment : Fragment() {
     override fun onDestroy() {
         super.onDestroy()
         handlerThread.quit()
+        viewModel.handlerThread.quit()
     }
 }

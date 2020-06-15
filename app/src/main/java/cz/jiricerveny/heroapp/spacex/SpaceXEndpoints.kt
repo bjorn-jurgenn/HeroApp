@@ -13,5 +13,5 @@ interface SpaceXEndpoints {
     fun getLaunches(
         @Query("launch_year") launch_year: Int?,
         @Query("launch_success") launch_success: Boolean?
-    ): Call<List<LaunchesData>>
+    ): Call<List<Launch>>
 }

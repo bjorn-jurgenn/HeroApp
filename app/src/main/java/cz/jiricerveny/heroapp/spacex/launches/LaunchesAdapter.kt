@@ -47,8 +47,8 @@ class LaunchesAdapter : RecyclerView.Adapter<LaunchesAdapter.LaunchesViewHolder>
                     launch.launchSuccess == true -> itemStatus.text = "successful"
                     else -> itemStatus.text = "failure"
                 }
-                itemRocketName.text = launch.rocketName
-                itemSiteName.text = launch.launchSite
+                itemRocketName.text = launch.rocket.name
+                itemSiteName.text = launch.launchSite.name
 
                 val zonedDateTime = ZonedDateTime.parse(launch.launchDateLocal)
                     .withZoneSameInstant(ZoneId.of("Europe/Paris"))

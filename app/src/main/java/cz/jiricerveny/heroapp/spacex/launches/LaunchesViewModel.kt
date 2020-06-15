@@ -7,7 +7,6 @@ import android.os.Message
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import cz.jiricerveny.heroapp.spacex.LaunchesData
 import cz.jiricerveny.heroapp.spacex.launches.database.Launch
 import cz.jiricerveny.heroapp.spacex.launches.database.LaunchDatabaseDao
 import retrofit2.Call
@@ -23,11 +22,14 @@ object Failure: LaunchesState()
 private const val TAG = "LaunchesViewModel"
 class LaunchesViewModel(
     private val database: LaunchDatabaseDao,
-    private val call: Call<List<LaunchesData>>,
-    private val handlerThread: LaunchesHandlerThread
+    private val call: Call<List<Launch>>,
+    val handlerThread: LaunchesHandlerThread
 ) : ViewModel() {
+    private val threadHandler = handlerThread.getHandler()
+
     @SuppressLint("HandlerLeak")
-    private val handler = object : Handler() {
+    private val uiHandler = object : Handler() {
+        @Suppress("UNCHECKED_CAST")
         override fun handleMessage(msg: Message) {
             super.handleMessage(msg)
             _displayableLaunches.value = msg.obj as List<Launch>
@@ -56,88 +58,64 @@ class LaunchesViewModel(
     }
 
     fun setDisplayable() {
-        handlerThread.getHandler().post {
+        threadHandler.post {
             val list = database.getList()
             val msg = Message.obtain()
             msg.obj = list
-            handler.sendMessage(msg)
+            uiHandler.sendMessage(msg)
         }
     }
 
     private fun addLaunch(launchItem: Launch) {
-        handlerThread.getHandler().post {
+        threadHandler.post {
             database.insert(launchItem)
         }
     }
 
     fun getFromYear(year: Int) {
-        handlerThread.getHandler().post {
+        threadHandler.post {
             val list = database.getFromYear(year)
             val msg = Message.obtain()
             msg.obj = list
-            handler.sendMessage(msg)
+            uiHandler.sendMessage(msg)
         }
     }
 
     fun getBySuccess(success: Boolean) {
-        handlerThread.getHandler().post {
+        threadHandler.post {
             val list = database.getBySuccess(success)
             val msg = Message.obtain()
             msg.obj = list
-            handler.sendMessage(msg)
+            uiHandler.sendMessage(msg)
         }
     }
 
     fun getBySuccessFromYear(success: Boolean, year: Int) {
-        handlerThread.getHandler().post {
+        threadHandler.post {
             val list = database.getBySuccessFromYear(success, year)
             val msg = Message.obtain()
             msg.obj = list
-            handler.sendMessage(msg)
+            uiHandler.sendMessage(msg)
         }
     }
 
     /** stáhne data ze SpaceXApi, uloží do databáze*/
     fun loadDataFromApi() {
         _progressBarVisible.value = true
-        call.clone().enqueue(object : Callback<List<LaunchesData>> {
+        call.clone().enqueue(object : Callback<List<Launch>> {
             override fun onResponse(
-                call: Call<List<LaunchesData>>,
-                response: Response<List<LaunchesData>>
+                call: Call<List<Launch>>,
+                response: Response<List<Launch>>
             ) {
                 val responseListOfLaunches = response.body() ?: listOf()
                 /** vytvoří Launch (položka v databázi) z výstupu z retrofitu a uloží do databáze */
                 for (launchItem in responseListOfLaunches) {
-                    // TODO Couldn't launchItem and and Launch be the same data class? You can use annotations if you don't want to save everything.
-                    // I tried but can't handle following...
-                    val flightNumber = launchItem.flightNumber.toInt()
-                    val missionName = launchItem.missionName
-                    val upcoming = launchItem.upcoming
-                    val launchYear = launchItem.launchYear
-                    val launchDate = launchItem.launchDate
-                    val rocket = launchItem.rocket.name // can't get this one directly
-                    val success = launchItem.success
-                    val launchSite = launchItem.launchSite.name // can't get this one directly
-                    val detail = launchItem.detail ?: "-"
-                    val wiki = launchItem.wikipedia ?: "-"
-                    val launch = Launch(
-                        flightNumber,
-                        missionName,
-                        upcoming,
-                        launchYear,
-                        launchDate,
-                        rocket,
-                        success,
-                        launchSite,
-                        detail,
-                        wiki
-                    )
-                    addLaunch(launch)
+                    addLaunch(launchItem)
                     _progressBarVisible.value = false
                 }
             }
 
-            override fun onFailure(call: Call<List<LaunchesData>>, t: Throwable) {
+            override fun onFailure(call: Call<List<Launch>>, t: Throwable) {
                 _message.value = t.message
                 _failure.value = true
                 _progressBarVisible.value = false

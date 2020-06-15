@@ -24,38 +24,3 @@ data class LandPadLocation(
     val latitude: String,
     val longitude: String
 )
-
-data class
-LaunchesData(
-    @SerializedName("flight_number")
-    val flightNumber: String,
-    @SerializedName("mission_name")
-    val missionName: String,
-    val upcoming: Boolean,
-    @SerializedName("launch_year")
-    val launchYear: Int,
-    @SerializedName("launch_date_local")
-    val launchDate: String,
-    val rocket: LaunchRocket,
-    @SerializedName("launch_success")
-    val success: Boolean?,
-    @SerializedName("launch_site")
-    val launchSite: LaunchSite,
-    val detail: String?,
-    val wikipedia: String?
-)
-
-data class LaunchRocket(
-    @SerializedName("rocket_id")
-    val id: String,
-    @SerializedName("rocket_name")
-    val name: String,
-    @SerializedName("rocket_type")
-    val type: String
-
-)
-
-data class LaunchSite(
-    @SerializedName("site_name_long")
-    val name: String
-)
