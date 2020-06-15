@@ -1,31 +1,38 @@
 
 package cz.jiricerveny.heroapp.spacex.launches
 
-import android.app.Application
-import android.util.Log
-import android.view.View
-import android.widget.Toast
-import androidx.lifecycle.AndroidViewModel
+import android.os.Handler
+import android.os.Message
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
 import cz.jiricerveny.heroapp.spacex.LaunchesData
 import cz.jiricerveny.heroapp.spacex.launches.database.Launch
 import cz.jiricerveny.heroapp.spacex.launches.database.LaunchDatabaseDao
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import kotlin.coroutines.CoroutineContext
 
+/** TODO
+sealed class LaunchesState
+data class Loaded(val list: List<Launch>): LaunchesState()
+object Loading: LaunchesState()
+object Failure: LaunchesState()
+ */
+
 class LaunchesViewModel(
-    private val database: LaunchDatabaseDao, application: Application,
-    private val _displayableLaunches: MutableLiveData<List<Launch>> = MutableLiveData(),
-    private val _failure: MutableLiveData<Boolean> = MutableLiveData(false)
-) :
-    AndroidViewModel(application), CoroutineScope {
+    private val database: LaunchDatabaseDao, private val call: Call<List<LaunchesData>>
+) : ViewModel(), CoroutineScope {
     override val coroutineContext: CoroutineContext
         get() = CoroutineScope(Dispatchers.Main + Job()).coroutineContext
 
+
+    private val _displayableLaunches: MutableLiveData<List<Launch>> = MutableLiveData()
     val displayableLaunches: LiveData<List<Launch>>
         get() = _displayableLaunches
 
@@ -33,18 +40,14 @@ class LaunchesViewModel(
     val progressBarVisible: LiveData<Boolean>
         get() = _progressBarVisible
 
+    private val _failure: MutableLiveData<Boolean> = MutableLiveData(false)
     val failure: LiveData<Boolean>
         get() = _failure
 
     private val _message = MutableLiveData<String>()
     val message: LiveData<String>
         get() = _message
-    private var firstTime = true
 
-/*    init {
-        // TODO can be moved to constructor (this was necessary for older livedata versions)
-        _displayableLaunches.value = listOf()
-    }*/
 
     fun onFailureEnded() {
         _failure.value = false
@@ -55,6 +58,7 @@ class LaunchesViewModel(
             val result = displayAll()
             _displayableLaunches.value = result
         }
+
     }
 
     private suspend fun displayAll(): List<Launch> {
@@ -106,7 +110,7 @@ class LaunchesViewModel(
     }
 
     /** stáhne data ze SpaceXApi, uloží do databáze*/
-    fun getDataFromApi(call: Call<List<LaunchesData>>) {
+    fun loadDataFromApi() {
         _progressBarVisible.value = true
         call.clone().enqueue(object : Callback<List<LaunchesData>> {
             override fun onResponse(

@@ -11,6 +11,7 @@ import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.Fragment
+import androidx.room.Room
 import com.google.android.material.navigation.NavigationView
 import cz.jiricerveny.heroapp.databinding.ActivityMainBinding
 import cz.jiricerveny.heroapp.databinding.NavHeaderBinding
@@ -21,6 +22,7 @@ import cz.jiricerveny.heroapp.basic.AnimationDrawablesFragment
 import cz.jiricerveny.heroapp.basic.CardsFragment
 import cz.jiricerveny.heroapp.basic.ChangeUsernameDialogFragment
 import cz.jiricerveny.heroapp.basic.DialogsFragment
+import cz.jiricerveny.heroapp.spacex.launches.database.LaunchDatabase
 
 const val EXTRA_MESSAGE = "cz.jiricerveny.aboutme.MESSAGE"
 const val ACTIVITY_RESULT = "cz.jiricerveny.aboutme.RESULT"
@@ -36,6 +38,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     private lateinit var drawerLayout: DrawerLayout
     private lateinit var navView: NavigationView
     private lateinit var headerBinding: NavHeaderBinding
+    private lateinit var db: LaunchDatabase
     private var position: Int = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -63,6 +66,14 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             headerBinding.username.text = savedInstanceState.getString("USERNAME")
         }
         navigateTo(position)
+
+        /*   db = Room.databaseBuilder(
+               applicationContext,
+               LaunchDatabase::class.java,
+               "launch_database"
+           )
+               .fallbackToDestructiveMigration()
+               .build()*/
     }
 
 

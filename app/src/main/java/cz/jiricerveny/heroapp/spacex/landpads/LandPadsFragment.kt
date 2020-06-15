@@ -21,8 +21,7 @@ import retrofit2.Callback
 import retrofit2.Response
 
 
-class LandPadsFragment : Fragment(),
-    LandpadAdapter.OnLandPadClickListener {
+class LandPadsFragment : Fragment() {
     private lateinit var binding: FragmentLandpadsBinding
     private lateinit var viewModel: LandPadViewModel
 
@@ -36,11 +35,13 @@ class LandPadsFragment : Fragment(),
 
         val recyclerView = binding.landpadsRecyclerView
         val adapter =
-            LandpadAdapter(this) // TODO I personaly don't like this style, baucause it makes the listener hard to find in class. ::onItemClicked and ::onLocationClicked would be more clear
+            LandpadAdapter(
+                ::onItemClicked,
+                ::onLocationClicked
+            )
         recyclerView.apply {
             layoutManager = LinearLayoutManager(activity)
             this.adapter = adapter
-            adapter.update(viewModel.landPads.value ?: listOf())
         }
 
         val call = ServiceBuilder.buildService(SpaceXEndpoints::class.java).getLandPads()
@@ -52,9 +53,7 @@ class LandPadsFragment : Fragment(),
             ) {
                 val listOfResults = response.body() ?: listOf()
                 viewModel.update(listOfResults)
-                (recyclerView.adapter as LandpadAdapter).update( // TODO you could simply use the adapter variable. Also, value should never be null if you initialize it properly
-                    viewModel.landPads.value ?: listOf()
-                )
+                adapter.update(viewModel.landPads.value!!)
                 binding.landpadsprogressBar.visibility = View.GONE
             }
 
@@ -67,7 +66,7 @@ class LandPadsFragment : Fragment(),
         return binding.root
     }
 
-    override fun onItemClicked(landPad: LandPadData) {
+    private fun onItemClicked(landPad: LandPadData) {
         parentFragmentManager.beginTransaction().apply {
             val index = viewModel.landPads.value?.indexOf(landPad) ?: -1
             val detailFragment =
@@ -80,7 +79,7 @@ class LandPadsFragment : Fragment(),
         }
     }
 
-    override fun onLocationClicked(lat: String, long: String) {
+    private fun onLocationClicked(lat: String, long: String) {
         val uriString = "geo:$lat,$long?q=$lat,$long&z=6"
         Log.i("LandPadsFragment", uriString)
         val uri = Uri.parse(uriString)

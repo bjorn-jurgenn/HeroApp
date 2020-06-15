@@ -1,51 +1,49 @@
 package cz.jiricerveny.heroapp.spacex.launches
 
 import android.app.AlertDialog
-import android.content.DialogInterface
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
+import cz.jiricerveny.heroapp.HeroApp
 import cz.jiricerveny.heroapp.R
 import cz.jiricerveny.heroapp.databinding.FragmentDialogLaunchesBinding
 import cz.jiricerveny.heroapp.databinding.FragmentLaunchesBinding
-import cz.jiricerveny.heroapp.spacex.LaunchesData
-import cz.jiricerveny.heroapp.spacex.ServiceBuilder
-import cz.jiricerveny.heroapp.spacex.SpaceXEndpoints
-import cz.jiricerveny.heroapp.spacex.launches.database.Launch
-import cz.jiricerveny.heroapp.spacex.launches.database.LaunchDatabase
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
-import kotlin.coroutines.coroutineContext
 
 
 class LaunchesFragment : Fragment() {
     private lateinit var binding: FragmentLaunchesBinding
-    private lateinit var viewModel: LaunchesViewModel
+    private val viewModel: LaunchesViewModel by viewModels {
+        LaunchesViewModelFactory(
+            (requireActivity().application as HeroApp).db.launchDatabaseDao,
+            (requireActivity().application as HeroApp).service
+        )
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
         binding = FragmentLaunchesBinding.inflate(layoutInflater, container, false)
-
-        val application = requireNotNull(this.activity).application
-        val dataSource = LaunchDatabase.getInstance(application).launchDatabaseDao
-        val viewModelFactory = LaunchesViewModelFactory(dataSource, application)
-        viewModel = ViewModelProvider(this, viewModelFactory).get(LaunchesViewModel::class.java)
+        val filterDialog = buildFilterDialog()
+        val reloadDialog = buildReloadDialog()
 
         val recyclerView = binding.launchesRecyclerView
         val adapter = LaunchesAdapter()
         recyclerView.apply {
             layoutManager = LinearLayoutManager(activity)
             this.adapter = adapter
+        }
+
+        val fab = binding.fab
+        fab.setOnClickListener {
+            filterDialog.show()
         }
 
         viewModel.setDisplayable()
@@ -58,35 +56,6 @@ class LaunchesFragment : Fragment() {
             else binding.launchesProgressBar.visibility = View.GONE
         })
 
-        val filterBuilder = AlertDialog.Builder(requireContext())
-        val filterLayout = layoutInflater.inflate(R.layout.fragment_dialog_launches, null)
-        filterBuilder.setView(filterLayout)
-        val filterDialogBinding = FragmentDialogLaunchesBinding.bind(filterLayout)
-        val dialog = filterBuilder.create()
-        filterDialogBinding.launchesDialogButton.setOnClickListener {
-            dialogButtonAction(filterDialogBinding)
-            dialog.dismiss()
-        }
-
-        val fab = binding.fab
-        fab.setOnClickListener {
-            dialog.show()
-        }
-
-        val service =
-            ServiceBuilder.buildService(SpaceXEndpoints::class.java)
-        val call = service.getLaunches(null, null)
-
-        val reloadBuilder = AlertDialog.Builder(requireContext())
-        reloadBuilder.setMessage("Reload")
-            .setPositiveButton("Yes", DialogInterface.OnClickListener { _, _ ->
-                viewModel.getDataFromApi(call)
-            })
-            .setNegativeButton("No", DialogInterface.OnClickListener { _, _ ->
-                Toast.makeText(requireContext(), "using offline data", Toast.LENGTH_SHORT).show()
-            })
-        val reloadDialog = reloadBuilder.create()
-
         viewModel.failure.observe(viewLifecycleOwner, Observer {
             if (it) {
                 Toast.makeText(activity, viewModel.message.value, Toast.LENGTH_LONG).show()
@@ -94,8 +63,7 @@ class LaunchesFragment : Fragment() {
                 reloadDialog.show()
             }
         })
-
-        viewModel.getDataFromApi(call)
+        viewModel.loadDataFromApi()
 
         return binding.root
     }
@@ -121,7 +89,31 @@ class LaunchesFragment : Fragment() {
             successChecked -> viewModel.getBySuccess(successful)
             else -> viewModel.setDisplayable()
         }
+    }
 
+    private fun buildFilterDialog(): AlertDialog {
+        val builder = AlertDialog.Builder(requireContext())
+        val layout = layoutInflater.inflate(R.layout.fragment_dialog_launches, null)
+        builder.setView(layout)
+        val filterDialogBinding = FragmentDialogLaunchesBinding.bind(layout)
+        val dialog = builder.create()
+        filterDialogBinding.launchesDialogButton.setOnClickListener {
+            dialogButtonAction(filterDialogBinding)
+            dialog.dismiss()
+        }
+        return dialog
+    }
+
+    private fun buildReloadDialog(): AlertDialog {
+        val builder = AlertDialog.Builder(requireContext())
+        builder.setMessage("Reload")
+            .setPositiveButton("Yes") { _, _ ->
+                viewModel.loadDataFromApi()
+            }
+            .setNegativeButton("No") { _, _ ->
+                Toast.makeText(requireContext(), "using offline data", Toast.LENGTH_SHORT).show()
+            }
+        return builder.create()
     }
 
 

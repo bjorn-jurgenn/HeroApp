@@ -9,7 +9,10 @@ import cz.jiricerveny.heroapp.R
 import cz.jiricerveny.heroapp.databinding.LandpadItemLayoutBinding
 import cz.jiricerveny.heroapp.spacex.LandPadData
 
-class LandpadAdapter(private val listener: OnLandPadClickListener) :
+class LandpadAdapter(
+    private val itemListener: (landsPad: LandPadData) -> Unit,
+    private val locationListener: (lat: String, lon: String) -> Unit
+) :
     RecyclerView.Adapter<LandpadAdapter.LandPadsViewHolder>() {
     private val landPads = mutableListOf<LandPadData>()
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): LandPadsViewHolder {
@@ -21,7 +24,7 @@ class LandpadAdapter(private val listener: OnLandPadClickListener) :
     override fun getItemCount(): Int = landPads.size
 
     override fun onBindViewHolder(holder: LandPadsViewHolder, position: Int) {
-        holder.bind(landPads[position], listener)
+        holder.bind(landPads[position])
     }
 
     fun update(list: List<LandPadData>) {
@@ -33,7 +36,7 @@ class LandpadAdapter(private val listener: OnLandPadClickListener) :
     inner class LandPadsViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         private val binding = LandpadItemLayoutBinding.bind(itemView)
 
-        fun bind(landPad: LandPadData, clickListener: OnLandPadClickListener) {
+        fun bind(landPad: LandPadData) {
 
             binding.apply {
                 itemName.text = landPad.name
@@ -46,20 +49,15 @@ class LandpadAdapter(private val listener: OnLandPadClickListener) :
                     ((landPad.totalLandings * 100) / landPad.totalLandings).toString()
                 itemLocation.text = landPad.location.name
                 itemLocation.setOnClickListener {
-                    clickListener.onLocationClicked(
+                    locationListener(
                         landPad.location.latitude, landPad.location.longitude
                     )
                 }
                 itemRegion.text = landPad.location.region
                 itemLocation.paintFlags = Paint.UNDERLINE_TEXT_FLAG
-                itemLayout.setOnClickListener { clickListener.onItemClicked(landPad) }
+                itemLayout.setOnClickListener { itemListener(landPad) }
             }
         }
-    }
-
-    interface OnLandPadClickListener {
-        fun onItemClicked(landPad: LandPadData)
-        fun onLocationClicked(lat: String, long: String)
     }
 }
 

@@ -6,7 +6,7 @@ import androidx.lifecycle.ViewModel
 import cz.jiricerveny.heroapp.spacex.LandPadData
 
 class LandPadViewModel : ViewModel() {
-    private val _landPads = MutableLiveData<List<LandPadData>>()
+    private val _landPads = MutableLiveData<List<LandPadData>>(listOf())
     val landPads: LiveData<List<LandPadData>>
         get() = _landPads
 
