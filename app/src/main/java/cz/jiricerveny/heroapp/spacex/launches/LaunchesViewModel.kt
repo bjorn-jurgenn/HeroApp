@@ -3,7 +3,6 @@ package cz.jiricerveny.heroapp.spacex.launches
 
 import android.annotation.SuppressLint
 import android.os.Handler
-import android.os.HandlerThread
 import android.os.Message
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -11,14 +10,9 @@ import androidx.lifecycle.ViewModel
 import cz.jiricerveny.heroapp.spacex.LaunchesData
 import cz.jiricerveny.heroapp.spacex.launches.database.Launch
 import cz.jiricerveny.heroapp.spacex.launches.database.LaunchDatabaseDao
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.launch
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
-import kotlin.coroutines.CoroutineContext
 
 /** TODO
 sealed class LaunchesState
@@ -31,10 +25,7 @@ class LaunchesViewModel(
     private val database: LaunchDatabaseDao,
     private val call: Call<List<LaunchesData>>,
     private val handlerThread: LaunchesHandlerThread
-) : ViewModel(), CoroutineScope {
-    override val coroutineContext: CoroutineContext
-        get() = CoroutineScope(Dispatchers.Main + Job()).coroutineContext
-
+) : ViewModel() {
     @SuppressLint("HandlerLeak")
     private val handler = object : Handler() {
         override fun handleMessage(msg: Message) {
@@ -65,10 +56,6 @@ class LaunchesViewModel(
     }
 
     fun setDisplayable() {
-        displayAll()
-    }
-
-    private fun displayAll() {
         handlerThread.getHandler().post {
             val list = database.getList()
             val msg = Message.obtain()
@@ -77,46 +64,36 @@ class LaunchesViewModel(
         }
     }
 
-    private suspend fun insert(launch: Launch) {
-        database.insert(launch)
-    }
-
     private fun addLaunch(launchItem: Launch) {
-        launch {
-            insert(launchItem)
+        handlerThread.getHandler().post {
+            database.insert(launchItem)
         }
-    }
-
-    private suspend fun displayDataFromYear(year: Int): List<Launch> {
-        return database.getFromYear(year)
     }
 
     fun getFromYear(year: Int) {
-        launch {
-            val result = displayDataFromYear(year)
-            _displayableLaunches.value = result
+        handlerThread.getHandler().post {
+            val list = database.getFromYear(year)
+            val msg = Message.obtain()
+            msg.obj = list
+            handler.sendMessage(msg)
         }
-    }
-
-    private suspend fun displayDataBySuccess(success: Boolean): List<Launch> {
-        return database.getBySuccess(success)
     }
 
     fun getBySuccess(success: Boolean) {
-        launch {
-            val result = displayDataBySuccess(success)
-            _displayableLaunches.value = result
+        handlerThread.getHandler().post {
+            val list = database.getBySuccess(success)
+            val msg = Message.obtain()
+            msg.obj = list
+            handler.sendMessage(msg)
         }
     }
 
-    private suspend fun displayDataBySuccessFromYear(success: Boolean, year: Int): List<Launch> {
-        return database.getBySuccessFromYear(success, year)
-    }
-
     fun getBySuccessFromYear(success: Boolean, year: Int) {
-        launch {
-            val result = displayDataBySuccessFromYear(success, year)
-            _displayableLaunches.value = result
+        handlerThread.getHandler().post {
+            val list = database.getBySuccessFromYear(success, year)
+            val msg = Message.obtain()
+            msg.obj = list
+            handler.sendMessage(msg)
         }
     }
 
