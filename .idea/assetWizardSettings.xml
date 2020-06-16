@@ -147,7 +147,7 @@
                                 <PersistentState>
                                   <option name="values">
                                     <map>
-                                      <entry key="url" value="jar:file:/Applications/Android%20Studio.app/Contents/plugins/android/lib/android.jar!/images/material_design_icons/content/ic_add_black_24dp.xml" />
+                                      <entry key="url" value="jar:file:/Applications/Android%20Studio.app/Contents/plugins/android/lib/android.jar!/images/material/icons/materialicons/looks_two/baseline_looks_two_24.xml" />
                                     </map>
                                   </option>
                                 </PersistentState>
@@ -157,8 +157,8 @@
                         </option>
                         <option name="values">
                           <map>
-                            <entry key="color" value="e3bb98" />
-                            <entry key="outputName" value="ic_add" />
+                            <entry key="color" value="88292f" />
+                            <entry key="outputName" value="ic_two" />
                             <entry key="sourceFile" value="$USER_HOME$/Downloads/Mlada_Boleslav_logo.svg" />
                           </map>
                         </option>

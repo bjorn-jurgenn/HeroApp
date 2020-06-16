@@ -8,13 +8,12 @@ import retrofit2.Call
 
 class LaunchesViewModelFactory(
     private val dataSource: LaunchDatabaseDao,
-    private val service: Call<List<Launch>>,
-    private val handlerThread: LaunchesHandlerThread
+    private val service: Call<List<Launch>>
 ) : ViewModelProvider.Factory {
     @Suppress("unchecked_cast")
     override fun <T : ViewModel?> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(LaunchesViewModel::class.java)) {
-            return LaunchesViewModel(dataSource, service, handlerThread) as T
+            return LaunchesViewModel(dataSource, service) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class")
     }

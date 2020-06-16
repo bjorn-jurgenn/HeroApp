@@ -1,9 +1,7 @@
 
 package cz.jiricerveny.heroapp.spacex.launches
 
-import android.annotation.SuppressLint
 import android.os.Handler
-import android.os.Message
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -19,22 +17,11 @@ data class Loaded(val list: List<Launch>): LaunchesState()
 object Loading: LaunchesState()
 object Failure: LaunchesState()
  */
-private const val TAG = "LaunchesViewModel"
 class LaunchesViewModel(
     private val database: LaunchDatabaseDao,
-    private val call: Call<List<Launch>>,
-    val handlerThread: LaunchesHandlerThread
+    private val call: Call<List<Launch>>
 ) : ViewModel() {
-    private val threadHandler = handlerThread.getHandler()
-
-    @SuppressLint("HandlerLeak")
-    private val uiHandler = object : Handler() {
-        @Suppress("UNCHECKED_CAST")
-        override fun handleMessage(msg: Message) {
-            super.handleMessage(msg)
-            _displayableLaunches.value = msg.obj as List<Launch>
-        }
-    }
+    private val mainHandler = Handler()
 
     private val _displayableLaunches: MutableLiveData<List<Launch>> = MutableLiveData()
     val displayableLaunches: LiveData<List<Launch>>
@@ -58,45 +45,50 @@ class LaunchesViewModel(
     }
 
     fun setDisplayable() {
-        threadHandler.post {
+        val runnable = Runnable {
             val list = database.getList()
-            val msg = Message.obtain()
-            msg.obj = list
-            uiHandler.sendMessage(msg)
+            mainHandler.post {
+                _displayableLaunches.value = list
+            }
         }
+        Thread(runnable).start()
     }
 
     private fun addLaunch(launchItem: Launch) {
-        threadHandler.post {
+        val runnable = Runnable {
             database.insert(launchItem)
         }
+        Thread(runnable).start()
     }
 
     fun getFromYear(year: Int) {
-        threadHandler.post {
+        val runnable = Runnable {
             val list = database.getFromYear(year)
-            val msg = Message.obtain()
-            msg.obj = list
-            uiHandler.sendMessage(msg)
+            mainHandler.post {
+                _displayableLaunches.value = list
+            }
         }
+        Thread(runnable).start()
     }
 
     fun getBySuccess(success: Boolean) {
-        threadHandler.post {
+        val runnable = Runnable {
             val list = database.getBySuccess(success)
-            val msg = Message.obtain()
-            msg.obj = list
-            uiHandler.sendMessage(msg)
+            mainHandler.post {
+                _displayableLaunches.value = list
+            }
         }
+        Thread(runnable).start()
     }
 
     fun getBySuccessFromYear(success: Boolean, year: Int) {
-        threadHandler.post {
+        val runnable = Runnable {
             val list = database.getBySuccessFromYear(success, year)
-            val msg = Message.obtain()
-            msg.obj = list
-            uiHandler.sendMessage(msg)
+            mainHandler.post {
+                _displayableLaunches.value = list
+            }
         }
+        Thread(runnable).start()
     }
 
     /** stáhne data ze SpaceXApi, uloží do databáze*/
