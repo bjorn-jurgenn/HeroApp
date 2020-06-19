@@ -3,6 +3,8 @@ package cz.jiricerveny.heroapp.spacex.launches
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import cz.jiricerveny.heroapp.R
 import cz.jiricerveny.heroapp.databinding.LaunchItemLayoutBinding
@@ -11,8 +13,8 @@ import java.time.ZoneId
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 
-class LaunchesAdapter : RecyclerView.Adapter<LaunchesAdapter.LaunchesViewHolder>() {
-    private val launches = mutableListOf<Launch>()
+class LaunchesAdapter :
+    ListAdapter<Launch, LaunchesAdapter.LaunchesViewHolder>(LaunchDiffCallback()) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): LaunchesViewHolder {
         val view =
@@ -21,17 +23,9 @@ class LaunchesAdapter : RecyclerView.Adapter<LaunchesAdapter.LaunchesViewHolder>
     }
 
     override fun onBindViewHolder(holder: LaunchesViewHolder, position: Int) {
-        return holder.bind(launches[position])
+        val item = getItem(position)
+        return holder.bind(item)
     }
-
-    override fun getItemCount(): Int = launches.size
-
-    fun update(list: List<Launch>) {
-        launches.clear()
-        launches.addAll(list)
-        notifyDataSetChanged()
-    }
-
 
     inner class LaunchesViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         private val binding = LaunchItemLayoutBinding.bind(itemView)
@@ -59,6 +53,16 @@ class LaunchesAdapter : RecyclerView.Adapter<LaunchesAdapter.LaunchesViewHolder>
             }
 
         }
+    }
+}
+
+class LaunchDiffCallback : DiffUtil.ItemCallback<Launch>() {
+    override fun areItemsTheSame(oldItem: Launch, newItem: Launch): Boolean {
+        return oldItem.flight_number == newItem.flight_number
+    }
+
+    override fun areContentsTheSame(oldItem: Launch, newItem: Launch): Boolean {
+        return oldItem == newItem
     }
 
 }

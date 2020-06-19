@@ -13,6 +13,7 @@ import androidx.core.app.NotificationManagerCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
+import androidx.lifecycle.Transformations
 import androidx.recyclerview.widget.LinearLayoutManager
 import cz.jiricerveny.heroapp.HeroApp
 import cz.jiricerveny.heroapp.MainActivity
@@ -59,7 +60,9 @@ class LaunchesFragment : Fragment() {
 
         viewModel.setDisplayable()
         viewModel.displayableLaunches.observe(viewLifecycleOwner, Observer {
-            adapter.update(it ?: listOf())
+            it?.let {
+                adapter.submitList(it)
+            }
         })
 
         viewModel.progressBarVisible.observe(viewLifecycleOwner, Observer {
@@ -110,6 +113,14 @@ class LaunchesFragment : Fragment() {
         val layout = layoutInflater.inflate(R.layout.fragment_dialog_launches, null)
         builder.setView(layout)
         val filterDialogBinding = FragmentDialogLaunchesBinding.bind(layout)
+        filterDialogBinding.launchesDialogSuccessful.setOnCheckedChangeListener { _, isChecked ->
+            viewModel.setChecked(isChecked)
+        }
+
+        viewModel.checked.observe(viewLifecycleOwner, Observer {
+            filterDialogBinding.launchesDialogSuccessfulSwitch.isEnabled = it
+        })
+
         val dialog = builder.create()
         filterDialogBinding.launchesDialogButton.setOnClickListener {
             dialogButtonAction(filterDialogBinding)

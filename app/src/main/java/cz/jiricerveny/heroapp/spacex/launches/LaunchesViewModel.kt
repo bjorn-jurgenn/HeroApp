@@ -39,6 +39,13 @@ class LaunchesViewModel(
     val message: LiveData<String>
         get() = _message
 
+    private val _checked = MutableLiveData(false)
+    val checked: LiveData<Boolean>
+        get() = _checked
+
+    fun setChecked(isChecked: Boolean) {
+        _checked.value = isChecked
+    }
 
     fun onFailureEnded() {
         _failure.value = false
@@ -103,8 +110,9 @@ class LaunchesViewModel(
                 /** vytvoří Launch (položka v databázi) z výstupu z retrofitu a uloží do databáze */
                 for (launchItem in responseListOfLaunches) {
                     addLaunch(launchItem)
-                    _progressBarVisible.value = false
                 }
+                _progressBarVisible.value = false
+                setDisplayable()
             }
 
             override fun onFailure(call: Call<List<Launch>>, t: Throwable) {
