@@ -8,6 +8,7 @@ import retrofit2.Call
 
 class LaunchesViewModelFactory(
     private val dataSource: LaunchDatabaseDao,
+    // TODO pass service instaed of call
     private val service: Call<List<Launch>>
 ) : ViewModelProvider.Factory {
     @Suppress("unchecked_cast")

@@ -43,6 +43,8 @@ class LaunchesBroadcastReceiver : BroadcastReceiver() {
         }
         Thread(runnable).start()
         val random = Random.nextInt(3)
+
+        // TODO this seems a little weird, create one service and then do the api calls, do not create a new service for each call
         val service = when (random) {
             0 -> app.serviceFail
             1 -> app.serviceSuccess
@@ -55,11 +57,15 @@ class LaunchesBroadcastReceiver : BroadcastReceiver() {
             2 -> "Only from 2015 launches loaded."
             else -> "All launches loaded."
         }
+
+        // TODO it is not recommended to do background task in broadcast receiver -> better solution would be to schedule a background job
+        // see the video at https://developer.android.com/guide/components/broadcasts#effects-on-process-state
         service.clone().enqueue(object : Callback<List<Launch>> {
             override fun onResponse(
                 call: Call<List<Launch>>,
                 response: Response<List<Launch>>
             ) {
+                // TODO see Dao file for improvements
                 val responseListOfLaunches = response.body() ?: listOf()
                 val runnableAdd = Runnable {
                     for (launchItem in responseListOfLaunches) {
@@ -67,6 +73,7 @@ class LaunchesBroadcastReceiver : BroadcastReceiver() {
                     }
                     mainHandler.post {
                         sendNotification(context, wifi, message)
+                        // TODO probably not necessary
                         app.newData.value = true
                     }
                 }

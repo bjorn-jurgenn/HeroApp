@@ -60,13 +60,16 @@ class LaunchesFragment : Fragment() {
 
         viewModel.setDisplayable()
         viewModel.displayableLaunches.observe(viewLifecycleOwner, Observer {
-            it?.let {
-                adapter.submitList(it)
-            }
-            if (it.isEmpty()) viewModel.nothingToDisplay()
+//            it?.let {
+//                adapter.submitList(it)
+//            }
+//            if (it.isEmpty()) viewModel.nothingToDisplay()
+            // TODO better
+            if (it.isNullOrEmpty()) viewModel.nothingToDisplay() else adapter.submitList(it)
         })
 
         viewModel.progressBarVisible.observe(viewLifecycleOwner, Observer {
+            // TODO does not look good, use parentheses for multiline if/else
             if (it) binding.launchesProgressBar.visibility = View.VISIBLE
             else {
                 binding.launchesProgressBar.visibility = View.GONE
@@ -74,6 +77,7 @@ class LaunchesFragment : Fragment() {
             }
         })
         val app = requireContext().applicationContext as HeroApp
+        // TODO this should not be necessary. You can simply observe the livedata from room
         app.newData.observe(viewLifecycleOwner, Observer {
             if (it) {
                 adapter.notifyDataSetChanged()
@@ -81,6 +85,9 @@ class LaunchesFragment : Fragment() {
             }
         })
 
+
+        // TODO you are observing a lot of livedata, a better solution might be something like described in this article
+        // https://zsmb.co/designing-and-working-with-single-view-states-on-android/
         viewModel.failure.observe(viewLifecycleOwner, Observer {
             if (it) {
                 Toast.makeText(activity, viewModel.message.value, Toast.LENGTH_LONG).show()
@@ -97,12 +104,15 @@ class LaunchesFragment : Fragment() {
 
     /** podle zvolených checkboxů v dialogu vyfiltruje výsledky*/
     private fun dialogButtonAction(binding: FragmentDialogLaunchesBinding) {
-        var year: Int? = null
-        try {
-            val string = binding.launchesDialogYear.text.toString()
-            year = string.toInt()
-        } catch (e: NumberFormatException) {
-        }
+//        var year: Int? = null
+//        try {
+//            val string = binding.launchesDialogYear.text.toString()
+//            year = string.toInt()
+//        } catch (e: NumberFormatException) {
+//        }
+        // TODO better
+        val year =  binding.launchesDialogYear.text.toString().toIntOrNull()
+
         val successful = binding.launchesDialogSuccessfulSwitch.isChecked
 
         val launchYearChecked = binding.launchesDialogYearCheckbox.isChecked
