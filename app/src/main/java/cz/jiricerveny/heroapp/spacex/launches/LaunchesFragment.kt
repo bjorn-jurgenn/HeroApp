@@ -13,7 +13,6 @@ import androidx.core.app.NotificationManagerCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
-import androidx.lifecycle.Transformations
 import androidx.recyclerview.widget.LinearLayoutManager
 import cz.jiricerveny.heroapp.HeroApp
 import cz.jiricerveny.heroapp.MainActivity
@@ -45,6 +44,7 @@ class LaunchesFragment : Fragment() {
         binding = FragmentLaunchesBinding.inflate(layoutInflater, container, false)
         val filterDialog = buildFilterDialog()
         val reloadDialog = buildReloadDialog()
+        val noDisplayableDialog = buildNoDisplayableDialog()
 
         val recyclerView = binding.launchesRecyclerView
         val adapter = LaunchesAdapter()
@@ -63,6 +63,7 @@ class LaunchesFragment : Fragment() {
             it?.let {
                 adapter.submitList(it)
             }
+            if (it.isEmpty()) viewModel.nothingToDisplay()
         })
 
         viewModel.progressBarVisible.observe(viewLifecycleOwner, Observer {
@@ -70,6 +71,13 @@ class LaunchesFragment : Fragment() {
             else {
                 binding.launchesProgressBar.visibility = View.GONE
                 sendOnChannel1()
+            }
+        })
+        val app = requireContext().applicationContext as HeroApp
+        app.newData.observe(viewLifecycleOwner, Observer {
+            if (it) {
+                adapter.notifyDataSetChanged()
+                app.newData.value = false
             }
         })
 
@@ -80,7 +88,9 @@ class LaunchesFragment : Fragment() {
                 reloadDialog.show()
             }
         })
-        viewModel.loadDataFromApi()
+        viewModel.anyDisplayable.observe(viewLifecycleOwner, Observer {
+            if (it == false) noDisplayableDialog.show()
+        })
 
         return binding.root
     }
@@ -130,6 +140,19 @@ class LaunchesFragment : Fragment() {
         return dialog
     }
 
+    private fun buildNoDisplayableDialog(): AlertDialog {
+        val builder = AlertDialog.Builder(requireContext())
+        builder.setTitle("No displayable data")
+            .setMessage("You can display all launches from database or get all data from SpaceX API")
+            .setPositiveButton("Display all") { _, _ ->
+                viewModel.setDisplayable()
+            }
+            .setNeutralButton("Get from API") { _, _ ->
+                viewModel.loadDataFromApi()
+            }
+        return builder.create()
+    }
+
     private fun buildReloadDialog(): AlertDialog {
         val builder = AlertDialog.Builder(requireContext())
         builder.setMessage("Reload")
@@ -155,14 +178,13 @@ class LaunchesFragment : Fragment() {
             PendingIntent.FLAG_UPDATE_CURRENT
         )
 
-
         val notification = NotificationCompat.Builder(
             requireContext(),
             (requireActivity().application as HeroApp).CHANNEL_1_ID
         )
             .setSmallIcon(R.drawable.ic_one)
             .setContentTitle("Completed")
-            .setContentInfo("Loading completed")
+            .setContentText("Loading completed")
             .setPriority(NotificationCompat.PRIORITY_HIGH)
             .setCategory(NotificationCompat.CATEGORY_MESSAGE)
             .setContentIntent(contentIntent)
@@ -179,7 +201,7 @@ class LaunchesFragment : Fragment() {
         )
             .setSmallIcon(R.drawable.ic_two)
             .setContentTitle("Settings changed")
-            .setContentInfo("Now displaying filtered result")
+            .setContentText("Now displaying filtered result")
             .setPriority(NotificationCompat.PRIORITY_LOW)
             .build()
         notificationManager.notify(2, notification)

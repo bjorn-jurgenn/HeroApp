@@ -24,5 +24,5 @@ interface LaunchDatabaseDao {
     fun getBySuccessFromYear(success: Boolean, launchYear: Int): List<Launch>
 
     @Query("DELETE FROM launch_database")
-    suspend fun clear()
+    fun clear()
 }

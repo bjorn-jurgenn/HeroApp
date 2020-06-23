@@ -11,7 +11,6 @@ import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.Fragment
-import androidx.room.Room
 import com.google.android.material.navigation.NavigationView
 import cz.jiricerveny.heroapp.databinding.ActivityMainBinding
 import cz.jiricerveny.heroapp.databinding.NavHeaderBinding
@@ -66,14 +65,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             headerBinding.username.text = savedInstanceState.getString("USERNAME")
         }
         navigateTo(position)
-
-        /*   db = Room.databaseBuilder(
-               applicationContext,
-               LaunchDatabase::class.java,
-               "launch_database"
-           )
-               .fallbackToDestructiveMigration()
-               .build()*/
     }
 
 
@@ -103,7 +94,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
      * Changes fragment to passed fragment
      * @param fr - Fragment to be displayed
      */
-    fun changeFragmentTo(fr: Fragment) {
+    private fun changeFragmentTo(fr: Fragment) {
         supportFragmentManager.beginTransaction().apply {
             replace(R.id.main_container, fr)
             commit()

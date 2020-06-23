@@ -43,6 +43,10 @@ class LaunchesViewModel(
     val checked: LiveData<Boolean>
         get() = _checked
 
+    private val _anyDisplayable = MutableLiveData(true)
+    val anyDisplayable: LiveData<Boolean>
+        get() = _anyDisplayable
+
     fun setChecked(isChecked: Boolean) {
         _checked.value = isChecked
     }
@@ -51,48 +55,64 @@ class LaunchesViewModel(
         _failure.value = false
     }
 
+    fun nothingToDisplay() {
+        _anyDisplayable.value = false
+    }
+
     fun setDisplayable() {
+        _progressBarVisible.value = true
         val runnable = Runnable {
             val list = database.getList()
             mainHandler.post {
                 _displayableLaunches.value = list
+                _progressBarVisible.value = false
             }
         }
         Thread(runnable).start()
     }
 
     private fun addLaunch(launchItem: Launch) {
+        _progressBarVisible.value = true
         val runnable = Runnable {
             database.insert(launchItem)
+            mainHandler.post {
+                _progressBarVisible.value = false
+            }
         }
         Thread(runnable).start()
     }
 
     fun getFromYear(year: Int) {
+        _progressBarVisible.value = true
         val runnable = Runnable {
             val list = database.getFromYear(year)
             mainHandler.post {
                 _displayableLaunches.value = list
+                _progressBarVisible.value = false
             }
         }
         Thread(runnable).start()
     }
 
     fun getBySuccess(success: Boolean) {
+        _progressBarVisible.value = true
         val runnable = Runnable {
             val list = database.getBySuccess(success)
             mainHandler.post {
                 _displayableLaunches.value = list
+                _progressBarVisible.value = false
             }
         }
         Thread(runnable).start()
     }
 
     fun getBySuccessFromYear(success: Boolean, year: Int) {
+        _progressBarVisible.value = true
         val runnable = Runnable {
             val list = database.getBySuccessFromYear(success, year)
             mainHandler.post {
                 _displayableLaunches.value = list
+                _progressBarVisible.value = false
             }
         }
         Thread(runnable).start()
@@ -111,7 +131,6 @@ class LaunchesViewModel(
                 for (launchItem in responseListOfLaunches) {
                     addLaunch(launchItem)
                 }
-                _progressBarVisible.value = false
                 setDisplayable()
             }
 
@@ -123,5 +142,4 @@ class LaunchesViewModel(
         })
 
     }
-
 }
