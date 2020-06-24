@@ -1,6 +1,8 @@
 package cz.jiricerveny.heroapp.spacex.launches.database
 
 import android.os.Handler
+import android.util.Log
+import androidx.lifecycle.LiveData
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
@@ -15,16 +17,16 @@ interface LaunchDatabaseDao {
     fun insert(launch: Launch)
 
     @Query("SELECT * FROM launch_database")
-    fun getList(): List<Launch>
+    fun getList(): LiveData<List<Launch>>
 
     @Query("SELECT * FROM launch_database WHERE launch_success = :key")
-    fun getBySuccess(key: Boolean): List<Launch>
+    fun getBySuccess(key: Boolean): LiveData<List<Launch>>
 
     @Query("SELECT * FROM launch_database WHERE launch_year = :key")
-    fun getFromYear(key: Int): List<Launch>
+    fun getFromYear(key: Int): LiveData<List<Launch>>
 
     @Query("SELECT * FROM launch_database WHERE launch_year = :launchYear AND launch_success = :success")
-    fun getBySuccessFromYear(success: Boolean, launchYear: Int): List<Launch>
+    fun getBySuccessFromYear(success: Boolean, launchYear: Int): LiveData<List<Launch>>
 
     @Query("DELETE FROM launch_database")
     fun clear()
@@ -40,23 +42,26 @@ class DBWrapper(private val dao: LaunchDatabaseDao, private val mainHandler: Han
         }
     }
 
-    fun getList(callback: (list: List<Launch>) -> Unit) {
+    fun getList(callback: (list: LiveData<List<Launch>>) -> Unit) {
         threadPool.execute {
             val list = dao.getList()
+            Log.i("LaunchDatabaseDao", "livedata value: ${list.value}")
             mainHandler.post { callback(list) }
         }
     }
 
-    fun getBySuccess(key: Boolean, callback: (list: List<Launch>) -> Unit) {
+    fun getBySuccess(key: Boolean, callback: (list: LiveData<List<Launch>>) -> Unit) {
         threadPool.execute {
             val list = dao.getBySuccess(key)
+            Log.i("LaunchDatabaseDao", "livedata value: ${list.value}")
             mainHandler.post { callback(list) }
         }
     }
 
-    fun getFromYear(key: Int, callback: (list: List<Launch>) -> Unit) {
+    fun getFromYear(key: Int, callback: (list: LiveData<List<Launch>>) -> Unit) {
         threadPool.execute {
             val list = dao.getFromYear(key)
+            Log.i("LaunchDatabaseDao", "livedata value: ${list.value}")
             mainHandler.post { callback(list) }
         }
     }
@@ -64,10 +69,11 @@ class DBWrapper(private val dao: LaunchDatabaseDao, private val mainHandler: Han
     fun getBySuccessFromYear(
         success: Boolean,
         launchYear: Int,
-        callback: (list: List<Launch>) -> Unit
+        callback: (list: LiveData<List<Launch>>) -> Unit
     ) {
         threadPool.execute {
             val list = dao.getBySuccessFromYear(success, launchYear)
+            Log.i("LaunchDatabaseDao", "livedata value: ${list.value}")
             mainHandler.post { callback(list) }
         }
     }

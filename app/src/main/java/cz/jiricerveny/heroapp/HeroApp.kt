@@ -8,6 +8,7 @@ import android.net.ConnectivityManager
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.room.Room
 import cz.jiricerveny.heroapp.spacex.ServiceBuilder
 import cz.jiricerveny.heroapp.spacex.SpaceXEndpoints

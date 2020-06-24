@@ -57,14 +57,15 @@ class LaunchesFragment : Fragment() {
         fab.setOnClickListener {
             filterDialog.show()
         }
-
-
         viewModel.state.observe(viewLifecycleOwner, Observer {
             when (it) {
                 is Loaded -> {
-                    adapter.submitList(it.list)
-                    hideProgress()
-                    sendOnChannel1()
+                    it.list.observe(viewLifecycleOwner, Observer { list ->
+                        adapter.submitList(list)
+                        hideProgress()
+                        sendOnChannel1()
+                    })
+
                 }
                 is Inserted -> viewModel.displayAll()
                 is Loading -> showProgress()
