@@ -65,7 +65,6 @@ class LaunchesFragment : Fragment() {
                         hideProgress()
                         sendOnChannel1()
                     })
-
                 }
                 is Inserted -> viewModel.displayAll()
                 is Loading -> showProgress()
