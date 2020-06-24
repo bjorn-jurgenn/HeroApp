@@ -14,7 +14,7 @@ import retrofit2.Callback
 import retrofit2.Response
 
 sealed class LaunchesState
-data class Loaded(val list: LiveData<List<Launch>>) : LaunchesState()
+data class Loaded(val list: List<Launch>) : LaunchesState()
 object Inserted : LaunchesState()
 object Loading : LaunchesState()
 object Failure : LaunchesState()
@@ -43,7 +43,7 @@ class LaunchesViewModel(
     fun displayAll() {
         _state.value = Loading
         dbWrapper.getList {
-            if (it.value.isNullOrEmpty()) _state.value = Nothing
+            if (it.isNullOrEmpty()) _state.value = Nothing
             else _state.value = Loaded(it)
         }
     }
@@ -56,7 +56,7 @@ class LaunchesViewModel(
     fun getFromYear(year: Int) {
         _state.value = Loading
         dbWrapper.getFromYear(year) {
-            if (it.value.isNullOrEmpty()) _state.value = Nothing
+            if (it.isNullOrEmpty()) _state.value = Nothing
             else _state.value = Loaded(it)
         }
     }
@@ -64,7 +64,7 @@ class LaunchesViewModel(
     fun getBySuccess(success: Boolean) {
         _state.value = Loading
         dbWrapper.getBySuccess(success) {
-            if (it.value.isNullOrEmpty()) _state.value = Nothing
+            if (it.isNullOrEmpty()) _state.value = Nothing
             else _state.value = Loaded(it)
         }
     }
@@ -72,7 +72,7 @@ class LaunchesViewModel(
     fun getBySuccessFromYear(success: Boolean, year: Int) {
         _state.value = Loading
         dbWrapper.getBySuccessFromYear(success, year) {
-            if (it.value.isNullOrEmpty()) _state.value = Nothing
+            if (it.isNullOrEmpty()) _state.value = Nothing
             else _state.value = Loaded(it)
         }
     }

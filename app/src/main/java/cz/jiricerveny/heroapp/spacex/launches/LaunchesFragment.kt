@@ -60,11 +60,11 @@ class LaunchesFragment : Fragment() {
         viewModel.state.observe(viewLifecycleOwner, Observer {
             when (it) {
                 is Loaded -> {
-                    it.list.observe(viewLifecycleOwner, Observer { list ->
-                        adapter.submitList(list)
-                        hideProgress()
-                        sendOnChannel1()
-                    })
+                    //      it.list.observe(viewLifecycleOwner, Observer { list ->
+                    adapter.submitList(it.list)
+                    hideProgress()
+                    sendOnChannel1()
+                    //       })
                 }
                 is Inserted -> viewModel.displayAll()
                 is Loading -> showProgress()
