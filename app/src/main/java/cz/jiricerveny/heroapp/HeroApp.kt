@@ -3,12 +3,17 @@ package cz.jiricerveny.heroapp
 import android.app.*
 import android.content.Context
 import android.content.Intent
+import android.database.Observable
 import android.net.ConnectivityManager
+import androidx.core.app.NotificationCompat
+import androidx.core.app.NotificationManagerCompat
+import androidx.lifecycle.LiveData
 import androidx.room.Room
 import cz.jiricerveny.heroapp.spacex.ServiceBuilder
 import cz.jiricerveny.heroapp.spacex.SpaceXEndpoints
 import cz.jiricerveny.heroapp.spacex.launches.LaunchesBroadcastReceiver
 import cz.jiricerveny.heroapp.spacex.launches.database.LaunchDatabase
+import kotlin.properties.ObservableProperty
 
 //import cz.jiricerveny.heroapp.spacex.launches.LaunchesWifiBroadcastReceiver
 
@@ -17,7 +22,7 @@ class HeroApp : Application() {
     val CHANNEL_1_ID = "channel1"
     val CHANNEL_2_ID = "channel2"
     //    var isWifiConnected: Boolean? = false
-    private val cm by lazy { getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager }
+    //private val cm by lazy { getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager }
 
 
 /*    private val builder: NetworkRequest.Builder = NetworkRequest.Builder()
@@ -59,6 +64,28 @@ class HeroApp : Application() {
             cm.unregisterNetworkCallback(networkCallback)
         }
     */
+
+    fun sendNotification(loaded: Boolean, msg: String) {
+        val notificationManager: NotificationManagerCompat = NotificationManagerCompat.from(this)
+
+        val notification = NotificationCompat.Builder(
+            this,
+            (this.applicationContext as HeroApp).CHANNEL_1_ID
+        )
+            .setContentText(msg)
+            .setSmallIcon(R.drawable.ic_one)
+            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+            .setCategory(NotificationCompat.CATEGORY_MESSAGE)
+            .setAutoCancel(true)
+        if (loaded) {
+            notification.setContentTitle("New data")
+
+        } else {
+            notification.setContentTitle("No Wi-Fi")
+        }
+        notificationManager.notify(1, notification.build())
+    }
+
     private fun createNotificationChannels() {
         val chanel1 = NotificationChannel(
             CHANNEL_1_ID,

@@ -32,6 +32,10 @@
         <receiver android:name=".NotificationReceiver" />
         <!--  <receiver android:name=".spacex.launches.LaunchesWifiBroadcastReceiver"/> -->
         <receiver android:name=".spacex.launches.LaunchesBroadcastReceiver" />
+        <service
+            android:name=".spacex.launches.LaunchesJobService"
+            android:permission="android.permission.BIND_JOB_SERVICE"
+            android:exported="true" />
 
     </application>
 

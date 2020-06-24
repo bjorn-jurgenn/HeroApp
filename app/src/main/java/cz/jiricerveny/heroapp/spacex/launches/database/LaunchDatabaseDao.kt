@@ -5,6 +5,7 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
 
@@ -30,14 +31,12 @@ interface LaunchDatabaseDao {
 }
 
 
-// TODO eg. like this
-class DBWrapper(val dao: LaunchDatabaseDao, val mainHandler: Handler) {
-    val threadPool = Executors.newFixedThreadPool(4)
+class DBWrapper(private val dao: LaunchDatabaseDao, private val mainHandler: Handler) {
+    private val threadPool = Executors.newFixedThreadPool(4)
 
-    fun insert(launch: Launch, callback: () -> Unit) {
+    fun insert(launch: Launch) {
         threadPool.execute {
             dao.insert(launch)
-            mainHandler.post { callback() }
         }
     }
 

@@ -13,98 +13,73 @@ import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 
-//TODO
 sealed class LaunchesState
 data class Loaded(val list: List<Launch>): LaunchesState()
-object Loading: LaunchesState()
-object Failure: LaunchesState()
+object Inserted : LaunchesState()
+object Loading : LaunchesState()
+object Failure : LaunchesState()
+object Nothing : LaunchesState()
 
 class LaunchesViewModel(
     database: LaunchDatabaseDao,
     service: SpaceXEndpoints
 ) : ViewModel() {
+    private val _state = MutableLiveData<LaunchesState>(Inserted)
+    val state: LiveData<LaunchesState>
+        get() = _state
 
     private val call = service.getLaunches(null, null)
-    private val _displayableLaunches: MutableLiveData<List<Launch>> = MutableLiveData()
-    val displayableLaunches: LiveData<List<Launch>>
-        get() = _displayableLaunches
 
-    private val _progressBarVisible = MutableLiveData(true)
-    val progressBarVisible: LiveData<Boolean>
-        get() = _progressBarVisible
-
-    private val _failure: MutableLiveData<Boolean> = MutableLiveData(false)
-    val failure: LiveData<Boolean>
-        get() = _failure
-
-    private val _message = MutableLiveData<String>()
-    val message: LiveData<String>
-        get() = _message
-
-    private val _checked = MutableLiveData(false)
-    val checked: LiveData<Boolean>
-        get() = _checked
-
-    private val _anyDisplayable = MutableLiveData(true)
-    val anyDisplayable: LiveData<Boolean>
-        get() = _anyDisplayable
+    private val _buttonChecked = MutableLiveData(false)
+    val buttonChecked: LiveData<Boolean>
+        get() = _buttonChecked
 
     fun setChecked(isChecked: Boolean) {
-        _checked.value = isChecked
-    }
-
-    fun onFailureEnded() {
-        _failure.value = false
-    }
-
-    fun nothingToDisplay() {
-        _anyDisplayable.value = false
+        _buttonChecked.value = isChecked
     }
 
     private val dbWrapper: DBWrapper = DBWrapper(database, Handler())
 
-    fun setDisplayable() {
-        _progressBarVisible.value = true
+    fun displayAll() {
+        _state.value = Loading
         dbWrapper.getList {
-            _displayableLaunches.value = it
-            _progressBarVisible.value = false
+            if (it.isNullOrEmpty()) _state.value = Nothing
+            else _state.value = Loaded(it)
         }
     }
 
     private fun addLaunch(launchItem: Launch) {
-        _progressBarVisible.value = true
-        dbWrapper.insert(launchItem) {
-            _progressBarVisible.value = false
-        }
+        _state.value = Loading
+        dbWrapper.insert(launchItem)
     }
 
     fun getFromYear(year: Int) {
-        _progressBarVisible.value = true
+        _state.value = Loading
         dbWrapper.getFromYear(year) {
-            _displayableLaunches.value = it
-            _progressBarVisible.value = false
+            if (it.isNullOrEmpty()) _state.value = Nothing
+            else _state.value = Loaded(it)
         }
     }
 
     fun getBySuccess(success: Boolean) {
-        _progressBarVisible.value = true
+        _state.value = Loading
         dbWrapper.getBySuccess(success) {
-            _displayableLaunches.value = it
-            _progressBarVisible.value = false
+            if (it.isNullOrEmpty()) _state.value = Nothing
+            else _state.value = Loaded(it)
         }
     }
 
     fun getBySuccessFromYear(success: Boolean, year: Int) {
-        _progressBarVisible.value = true
+        _state.value = Loading
         dbWrapper.getBySuccessFromYear(success, year) {
-            _displayableLaunches.value = it
-            _progressBarVisible.value = false
+            if (it.isNullOrEmpty()) _state.value = Nothing
+            else _state.value = Loaded(it)
         }
     }
 
     /** stáhne data ze SpaceXApi, uloží do databáze*/
     fun loadDataFromApi() {
-        _progressBarVisible.value = true
+        _state.value = Loading
         call.clone().enqueue(object : Callback<List<Launch>> {
             override fun onResponse(
                 call: Call<List<Launch>>,
@@ -115,13 +90,11 @@ class LaunchesViewModel(
                 for (launchItem in responseListOfLaunches) {
                     addLaunch(launchItem)
                 }
-                setDisplayable()
+                _state.value = Inserted
             }
 
             override fun onFailure(call: Call<List<Launch>>, t: Throwable) {
-                _message.value = t.message
-                _failure.value = true
-                _progressBarVisible.value = false
+                _state.value = Failure
             }
         })
 

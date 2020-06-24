@@ -10,6 +10,8 @@ class LandPadViewModel : ViewModel() {
     val landPads: LiveData<List<LandPadData>>
         get() = _landPads
 
+    val index = MutableLiveData<Int>()
+
     fun update(list: List<LandPadData>) {
         _landPads.value = list
     }

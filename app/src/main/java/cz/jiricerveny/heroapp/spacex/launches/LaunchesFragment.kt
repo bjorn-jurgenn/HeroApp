@@ -58,41 +58,40 @@ class LaunchesFragment : Fragment() {
             filterDialog.show()
         }
 
-        viewModel.setDisplayable()
-        viewModel.displayableLaunches.observe(viewLifecycleOwner, Observer {
-            if (it.isNullOrEmpty()) viewModel.nothingToDisplay() else adapter.submitList(it)
-        })
 
-        viewModel.progressBarVisible.observe(viewLifecycleOwner, Observer {
-            if (it) {
-                binding.launchesProgressBar.visibility = View.VISIBLE
-            } else {
-                binding.launchesProgressBar.visibility = View.GONE
-                sendOnChannel1()
+        viewModel.state.observe(viewLifecycleOwner, Observer {
+            when (it) {
+                is Loaded -> {
+                    adapter.submitList(it.list)
+                    hideProgress()
+                    sendOnChannel1()
+                }
+                is Inserted -> viewModel.displayAll()
+                is Loading -> showProgress()
+                is Failure -> {
+                    hideProgress()
+                    reloadDialog.show()
+                }
+                is Nothing -> {
+                    noDisplayableDialog.show()
+                    hideProgress()
+                }
             }
         })
-        // TODO this should not be necessary. You can simply observe the livedata from room
-
-
-        // TODO you are observing a lot of livedata, a better solution might be something like described in this article
-        // https://zsmb.co/designing-and-working-with-single-view-states-on-android/
-        viewModel.failure.observe(viewLifecycleOwner, Observer {
-            if (it) {
-                Toast.makeText(activity, viewModel.message.value, Toast.LENGTH_LONG).show()
-                viewModel.onFailureEnded()
-                reloadDialog.show()
-            }
-        })
-        viewModel.anyDisplayable.observe(viewLifecycleOwner, Observer {
-            if (it == false) noDisplayableDialog.show()
-        })
-
+        // TODO  observe data
         return binding.root
     }
 
-    /** podle zvolených checkboxů v dialogu vyfiltruje výsledky*/
+    private fun showProgress() {
+        binding.launchesProgressBar.visibility = View.VISIBLE
+    }
+
+    private fun hideProgress() {
+        binding.launchesProgressBar.visibility = View.GONE
+    }
+
     private fun dialogButtonAction(binding: FragmentDialogLaunchesBinding) {
-        val year =  binding.launchesDialogYear.text.toString().toIntOrNull()
+        val year = binding.launchesDialogYear.text.toString().toIntOrNull()
 
         val successful = binding.launchesDialogSuccessfulSwitch.isChecked
 
@@ -105,7 +104,7 @@ class LaunchesFragment : Fragment() {
             )
             launchYearChecked && year != null -> viewModel.getFromYear(year)
             successChecked -> viewModel.getBySuccess(successful)
-            else -> viewModel.setDisplayable()
+            else -> viewModel.displayAll()
         }
     }
 
@@ -118,7 +117,7 @@ class LaunchesFragment : Fragment() {
             viewModel.setChecked(isChecked)
         }
 
-        viewModel.checked.observe(viewLifecycleOwner, Observer {
+        viewModel.buttonChecked.observe(viewLifecycleOwner, Observer {
             filterDialogBinding.launchesDialogSuccessfulSwitch.isEnabled = it
         })
 
@@ -136,7 +135,7 @@ class LaunchesFragment : Fragment() {
         builder.setTitle("No displayable data")
             .setMessage("You can display all launches from database or get all data from SpaceX API")
             .setPositiveButton("Display all") { _, _ ->
-                viewModel.setDisplayable()
+                viewModel.displayAll()
             }
             .setNeutralButton("Get from API") { _, _ ->
                 viewModel.loadDataFromApi()

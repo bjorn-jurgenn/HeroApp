@@ -69,10 +69,9 @@ class LandPadsFragment : Fragment() {
     private fun onItemClicked(landPad: LandPadData) {
         parentFragmentManager.beginTransaction().apply {
             val index = viewModel.landPads.value?.indexOf(landPad) ?: -1
+            viewModel.index.value = index
             val detailFragment =
-                LandPadDetailFragment(
-                    index
-                )
+                LandPadDetailFragment()
             replace(R.id.main_container, detailFragment)
             addToBackStack(null)
             commit()
