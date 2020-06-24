@@ -2,6 +2,7 @@
 package cz.jiricerveny.heroapp.spacex.launches
 
 import android.os.Handler
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -14,7 +15,7 @@ import retrofit2.Callback
 import retrofit2.Response
 
 sealed class LaunchesState
-data class Loaded(val list: List<Launch>) : LaunchesState()
+data class Loaded(val list: LiveData<List<Launch>>, val filtered: Boolean) : LaunchesState()
 object Inserted : LaunchesState()
 object Loading : LaunchesState()
 object Failure : LaunchesState()
@@ -34,8 +35,20 @@ class LaunchesViewModel(
     val buttonChecked: LiveData<Boolean>
         get() = _buttonChecked
 
+    private val _filtering = MutableLiveData(false)
+    val filtering: LiveData<Boolean>
+        get() = _filtering
+
+    fun setFiltering() {
+        _filtering.value = true
+    }
+
     fun setChecked(isChecked: Boolean) {
         _buttonChecked.value = isChecked
+    }
+
+    fun setNothing() {
+        _state.value = Nothing
     }
 
     private val dbWrapper: DBWrapper = DBWrapper(database, Handler())
@@ -43,8 +56,10 @@ class LaunchesViewModel(
     fun displayAll() {
         _state.value = Loading
         dbWrapper.getList {
-            if (it.isNullOrEmpty()) _state.value = Nothing
-            else _state.value = Loaded(it)
+            Log.i("Launch", "livedata value: ${it.value}")
+            //if (it.value.isNullOrEmpty()) _state.value = Nothing
+            _state.value = Loaded(it, false)
+            _filtering.value = false
         }
     }
 
@@ -56,24 +71,30 @@ class LaunchesViewModel(
     fun getFromYear(year: Int) {
         _state.value = Loading
         dbWrapper.getFromYear(year) {
-            if (it.isNullOrEmpty()) _state.value = Nothing
-            else _state.value = Loaded(it)
+            Log.i("Launch", "livedata value: ${it.value}")
+            //if (it.value.isNullOrEmpty()) _state.value = Nothing
+            _state.value = Loaded(it, _filtering.value!!)
+            _filtering.value = false
         }
     }
 
     fun getBySuccess(success: Boolean) {
         _state.value = Loading
         dbWrapper.getBySuccess(success) {
-            if (it.isNullOrEmpty()) _state.value = Nothing
-            else _state.value = Loaded(it)
+            Log.i("Launch", "livedata value: ${it.value}")
+            //if (it.value.isNullOrEmpty()) _state.value = Nothing
+            _state.value = Loaded(it, _filtering.value!!)
+            _filtering.value = false
         }
     }
 
     fun getBySuccessFromYear(success: Boolean, year: Int) {
         _state.value = Loading
         dbWrapper.getBySuccessFromYear(success, year) {
-            if (it.isNullOrEmpty()) _state.value = Nothing
-            else _state.value = Loaded(it)
+            Log.i("Launch", "livedata value: ${it.value}")
+            //if (it.value.isNullOrEmpty()) _state.value = Nothing
+            _state.value = Loaded(it, _filtering.value!!)
+            _filtering.value = false
         }
     }
 

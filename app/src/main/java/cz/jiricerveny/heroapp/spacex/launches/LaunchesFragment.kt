@@ -60,11 +60,10 @@ class LaunchesFragment : Fragment() {
         viewModel.state.observe(viewLifecycleOwner, Observer {
             when (it) {
                 is Loaded -> {
-                    //      it.list.observe(viewLifecycleOwner, Observer { list ->
-                    adapter.submitList(it.list)
-                    hideProgress()
-                    sendOnChannel1()
-                    //       })
+                    it.list.observe(viewLifecycleOwner, Observer { list ->
+                        adapter.submitList(list)
+                        hideProgress()
+                    })
                 }
                 is Inserted -> viewModel.displayAll()
                 is Loading -> showProgress()
@@ -98,12 +97,18 @@ class LaunchesFragment : Fragment() {
         val launchYearChecked = binding.launchesDialogYearCheckbox.isChecked
         val successChecked = binding.launchesDialogSuccessful.isChecked
         when {
-            launchYearChecked && year != null && successChecked -> viewModel.getBySuccessFromYear(
-                successful,
-                year
-            )
-            launchYearChecked && year != null -> viewModel.getFromYear(year)
-            successChecked -> viewModel.getBySuccess(successful)
+            launchYearChecked && year != null && successChecked -> {
+                viewModel.setFiltering()
+                viewModel.getBySuccessFromYear(successful, year)
+            }
+            launchYearChecked && year != null -> {
+                viewModel.setFiltering()
+                viewModel.getFromYear(year)
+            }
+            successChecked -> {
+                viewModel.setFiltering()
+                viewModel.getBySuccess(successful)
+            }
             else -> viewModel.displayAll()
         }
     }
