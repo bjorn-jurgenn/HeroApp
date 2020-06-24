@@ -5,6 +5,7 @@ import android.os.Handler
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import cz.jiricerveny.heroapp.spacex.SpaceXEndpoints
 import cz.jiricerveny.heroapp.spacex.launches.database.DBWrapper
 import cz.jiricerveny.heroapp.spacex.launches.database.Launch
 import cz.jiricerveny.heroapp.spacex.launches.database.LaunchDatabaseDao
@@ -12,19 +13,18 @@ import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 
-/** TODO
+//TODO
 sealed class LaunchesState
 data class Loaded(val list: List<Launch>): LaunchesState()
 object Loading: LaunchesState()
 object Failure: LaunchesState()
- */
-class LaunchesViewModel(
-    private val database: LaunchDatabaseDao,
-    // TODO better way would be to pass the whole service
-    private val call: Call<List<Launch>>
-) : ViewModel() {
-    private val mainHandler = Handler()
 
+class LaunchesViewModel(
+    database: LaunchDatabaseDao,
+    service: SpaceXEndpoints
+) : ViewModel() {
+
+    private val call = service.getLaunches(null, null)
     private val _displayableLaunches: MutableLiveData<List<Launch>> = MutableLiveData()
     val displayableLaunches: LiveData<List<Launch>>
         get() = _displayableLaunches
@@ -61,10 +61,8 @@ class LaunchesViewModel(
         _anyDisplayable.value = false
     }
 
-    // TODO see Dao file for readability improvement
-    val dbWrapper: DBWrapper = DBWrapper(database, Handler())
+    private val dbWrapper: DBWrapper = DBWrapper(database, Handler())
 
-    // TODO something like this, not sure whether it works
     fun setDisplayable() {
         _progressBarVisible.value = true
         dbWrapper.getList {
@@ -75,49 +73,33 @@ class LaunchesViewModel(
 
     private fun addLaunch(launchItem: Launch) {
         _progressBarVisible.value = true
-        val runnable = Runnable {
-            database.insert(launchItem)
-            mainHandler.post {
-                _progressBarVisible.value = false
-            }
+        dbWrapper.insert(launchItem) {
+            _progressBarVisible.value = false
         }
-        Thread(runnable).start()
     }
 
     fun getFromYear(year: Int) {
         _progressBarVisible.value = true
-        val runnable = Runnable {
-            val list = database.getFromYear(year)
-            mainHandler.post {
-                _displayableLaunches.value = list
-                _progressBarVisible.value = false
-            }
+        dbWrapper.getFromYear(year) {
+            _displayableLaunches.value = it
+            _progressBarVisible.value = false
         }
-        Thread(runnable).start()
     }
 
     fun getBySuccess(success: Boolean) {
         _progressBarVisible.value = true
-        val runnable = Runnable {
-            val list = database.getBySuccess(success)
-            mainHandler.post {
-                _displayableLaunches.value = list
-                _progressBarVisible.value = false
-            }
+        dbWrapper.getBySuccess(success) {
+            _displayableLaunches.value = it
+            _progressBarVisible.value = false
         }
-        Thread(runnable).start()
     }
 
     fun getBySuccessFromYear(success: Boolean, year: Int) {
         _progressBarVisible.value = true
-        val runnable = Runnable {
-            val list = database.getBySuccessFromYear(success, year)
-            mainHandler.post {
-                _displayableLaunches.value = list
-                _progressBarVisible.value = false
-            }
+        dbWrapper.getBySuccessFromYear(success, year) {
+            _displayableLaunches.value = it
+            _progressBarVisible.value = false
         }
-        Thread(runnable).start()
     }
 
     /** stáhne data ze SpaceXApi, uloží do databáze*/

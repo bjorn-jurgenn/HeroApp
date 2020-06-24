@@ -6,7 +6,6 @@ import androidx.room.PrimaryKey
 import com.google.gson.annotations.SerializedName
 
 
-// TODO remove and move annotations to LaunchItem
 @Entity(tableName = "launch_database")
 data class Launch(
     @PrimaryKey(autoGenerate = true)

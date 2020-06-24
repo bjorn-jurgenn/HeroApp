@@ -12,6 +12,7 @@ import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import cz.jiricerveny.heroapp.HeroApp
 import cz.jiricerveny.heroapp.R
+import cz.jiricerveny.heroapp.spacex.launches.database.DBWrapper
 import cz.jiricerveny.heroapp.spacex.launches.database.Launch
 import retrofit2.Call
 import retrofit2.Callback
@@ -35,21 +36,16 @@ class LaunchesBroadcastReceiver : BroadcastReceiver() {
     }
 
     private fun loadNew(context: Context?, wifi: Boolean) {
-        val mainHandler = Handler()
         val app = context?.applicationContext as HeroApp
         val db = app.db
-        val runnable = Runnable {
-            db.launchDatabaseDao.clear()
-        }
-        Thread(runnable).start()
+        DBWrapper(db.launchDatabaseDao, Handler()).clear()
         val random = Random.nextInt(3)
 
-        // TODO this seems a little weird, create one service and then do the api calls, do not create a new service for each call
-        val service = when (random) {
-            0 -> app.serviceFail
-            1 -> app.serviceSuccess
-            2 -> app.service2015
-            else -> app.service
+        val call = when (random) {
+            0 -> app.service.getLaunches(null, false)
+            1 -> app.service.getLaunches(null, true)
+            2 -> app.service.getLaunches(2015, null)
+            else -> app.service.getLaunches(null, null)
         }
         val message = when (random) {
             0 -> "Only failed launches loaded."
@@ -57,27 +53,20 @@ class LaunchesBroadcastReceiver : BroadcastReceiver() {
             2 -> "Only from 2015 launches loaded."
             else -> "All launches loaded."
         }
-
         // TODO it is not recommended to do background task in broadcast receiver -> better solution would be to schedule a background job
         // see the video at https://developer.android.com/guide/components/broadcasts#effects-on-process-state
-        service.clone().enqueue(object : Callback<List<Launch>> {
+        call.clone().enqueue(object : Callback<List<Launch>> {
             override fun onResponse(
                 call: Call<List<Launch>>,
                 response: Response<List<Launch>>
             ) {
-                // TODO see Dao file for improvements
                 val responseListOfLaunches = response.body() ?: listOf()
-                val runnableAdd = Runnable {
-                    for (launchItem in responseListOfLaunches) {
-                        db.launchDatabaseDao.insert(launchItem)
-                    }
-                    mainHandler.post {
+                val dbWrapper = DBWrapper(db.launchDatabaseDao, Handler())
+                for (launchItem in responseListOfLaunches) {
+                    dbWrapper.insert(launchItem) {
                         sendNotification(context, wifi, message)
-                        // TODO probably not necessary
-                        app.newData.value = true
                     }
                 }
-                Thread(runnableAdd).start()
             }
 
             override fun onFailure(call: Call<List<Launch>>, t: Throwable) {

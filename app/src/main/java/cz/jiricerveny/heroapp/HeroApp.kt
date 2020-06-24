@@ -4,7 +4,6 @@ import android.app.*
 import android.content.Context
 import android.content.Intent
 import android.net.ConnectivityManager
-import androidx.lifecycle.MutableLiveData
 import androidx.room.Room
 import cz.jiricerveny.heroapp.spacex.ServiceBuilder
 import cz.jiricerveny.heroapp.spacex.SpaceXEndpoints
@@ -17,10 +16,7 @@ import cz.jiricerveny.heroapp.spacex.launches.database.LaunchDatabase
 class HeroApp : Application() {
     val CHANNEL_1_ID = "channel1"
     val CHANNEL_2_ID = "channel2"
-
     //    var isWifiConnected: Boolean? = false
-    val newData = MutableLiveData(false)
-
     private val cm by lazy { getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager }
 
 
@@ -48,13 +44,7 @@ class HeroApp : Application() {
             .fallbackToDestructiveMigration()
             .build()
     }
-    val service = ServiceBuilder.buildService(SpaceXEndpoints::class.java).getLaunches(null, null)
-    val serviceFail =
-        ServiceBuilder.buildService(SpaceXEndpoints::class.java).getLaunches(null, false)
-    val serviceSuccess =
-        ServiceBuilder.buildService(SpaceXEndpoints::class.java).getLaunches(null, true)
-    val service2015 =
-        ServiceBuilder.buildService(SpaceXEndpoints::class.java).getLaunches(2015, null)
+    val service = ServiceBuilder.buildService(SpaceXEndpoints::class.java)
 
     override fun onCreate() {
         super.onCreate()

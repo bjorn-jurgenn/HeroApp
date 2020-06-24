@@ -2,14 +2,12 @@ package cz.jiricerveny.heroapp.spacex.launches
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import cz.jiricerveny.heroapp.spacex.launches.database.Launch
+import cz.jiricerveny.heroapp.spacex.SpaceXEndpoints
 import cz.jiricerveny.heroapp.spacex.launches.database.LaunchDatabaseDao
-import retrofit2.Call
 
 class LaunchesViewModelFactory(
     private val dataSource: LaunchDatabaseDao,
-    // TODO pass service instaed of call
-    private val service: Call<List<Launch>>
+    private val service: SpaceXEndpoints
 ) : ViewModelProvider.Factory {
     @Suppress("unchecked_cast")
     override fun <T : ViewModel?> create(modelClass: Class<T>): T {
