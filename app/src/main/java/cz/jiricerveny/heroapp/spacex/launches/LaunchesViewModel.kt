@@ -15,7 +15,7 @@ import retrofit2.Callback
 import retrofit2.Response
 
 sealed class LaunchesState
-data class Loaded(val list: LiveData<List<Launch>>) : LaunchesState()
+data class Loaded(val list: LiveData<List<Launch>>, val filtered: Boolean) : LaunchesState()
 object Inserted : LaunchesState()
 object Loading : LaunchesState()
 object Failure : LaunchesState()
@@ -35,8 +35,20 @@ class LaunchesViewModel(
     val buttonChecked: LiveData<Boolean>
         get() = _buttonChecked
 
+    private val _filtering = MutableLiveData(false)
+    val filtering: LiveData<Boolean>
+        get() = _filtering
+
+    fun setFiltering() {
+        _filtering.value = true
+    }
+
     fun setChecked(isChecked: Boolean) {
         _buttonChecked.value = isChecked
+    }
+
+    fun setNothing() {
+        _state.value = Nothing
     }
 
     private val dbWrapper: DBWrapper = DBWrapper(database, Handler())
@@ -45,8 +57,9 @@ class LaunchesViewModel(
         _state.value = Loading
         dbWrapper.getList {
             Log.i("Launch", "livedata value: ${it.value}")
-            if (it.value.isNullOrEmpty()) _state.value = Nothing
-            else _state.value = Loaded(it)
+            //if (it.value.isNullOrEmpty()) _state.value = Nothing
+            _state.value = Loaded(it, false)
+            _filtering.value = false
         }
     }
 
@@ -59,8 +72,9 @@ class LaunchesViewModel(
         _state.value = Loading
         dbWrapper.getFromYear(year) {
             Log.i("Launch", "livedata value: ${it.value}")
-            if (it.value.isNullOrEmpty()) _state.value = Nothing
-            else _state.value = Loaded(it)
+            //if (it.value.isNullOrEmpty()) _state.value = Nothing
+            _state.value = Loaded(it, _filtering.value!!)
+            _filtering.value = false
         }
     }
 
@@ -68,8 +82,9 @@ class LaunchesViewModel(
         _state.value = Loading
         dbWrapper.getBySuccess(success) {
             Log.i("Launch", "livedata value: ${it.value}")
-            if (it.value.isNullOrEmpty()) _state.value = Nothing
-            else _state.value = Loaded(it)
+            //if (it.value.isNullOrEmpty()) _state.value = Nothing
+            _state.value = Loaded(it, _filtering.value!!)
+            _filtering.value = false
         }
     }
 
@@ -77,8 +92,9 @@ class LaunchesViewModel(
         _state.value = Loading
         dbWrapper.getBySuccessFromYear(success, year) {
             Log.i("Launch", "livedata value: ${it.value}")
-            if (it.value.isNullOrEmpty()) _state.value = Nothing
-            else _state.value = Loaded(it)
+            //if (it.value.isNullOrEmpty()) _state.value = Nothing
+            _state.value = Loaded(it, _filtering.value!!)
+            _filtering.value = false
         }
     }
 
