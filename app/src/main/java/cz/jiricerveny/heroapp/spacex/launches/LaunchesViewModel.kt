@@ -2,6 +2,7 @@
 package cz.jiricerveny.heroapp.spacex.launches
 
 import android.os.Handler
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -43,6 +44,7 @@ class LaunchesViewModel(
     fun displayAll() {
         _state.value = Loading
         dbWrapper.getList {
+            Log.i("Launch", "livedata value: ${it.value}")
             if (it.value.isNullOrEmpty()) _state.value = Nothing
             else _state.value = Loaded(it)
         }
@@ -56,6 +58,7 @@ class LaunchesViewModel(
     fun getFromYear(year: Int) {
         _state.value = Loading
         dbWrapper.getFromYear(year) {
+            Log.i("Launch", "livedata value: ${it.value}")
             if (it.value.isNullOrEmpty()) _state.value = Nothing
             else _state.value = Loaded(it)
         }
@@ -64,6 +67,7 @@ class LaunchesViewModel(
     fun getBySuccess(success: Boolean) {
         _state.value = Loading
         dbWrapper.getBySuccess(success) {
+            Log.i("Launch", "livedata value: ${it.value}")
             if (it.value.isNullOrEmpty()) _state.value = Nothing
             else _state.value = Loaded(it)
         }
@@ -72,6 +76,7 @@ class LaunchesViewModel(
     fun getBySuccessFromYear(success: Boolean, year: Int) {
         _state.value = Loading
         dbWrapper.getBySuccessFromYear(success, year) {
+            Log.i("Launch", "livedata value: ${it.value}")
             if (it.value.isNullOrEmpty()) _state.value = Nothing
             else _state.value = Loaded(it)
         }

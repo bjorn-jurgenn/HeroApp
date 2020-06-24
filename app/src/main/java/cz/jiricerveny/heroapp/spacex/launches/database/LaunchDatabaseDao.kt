@@ -61,7 +61,7 @@ class DBWrapper(private val dao: LaunchDatabaseDao, private val mainHandler: Han
     fun getFromYear(key: Int, callback: (list: LiveData<List<Launch>>) -> Unit) {
         threadPool.execute {
             val list = dao.getFromYear(key)
-            Log.i("LaunchDatabaseDao", "livedata value: ${list.value}")
+            Log.i("Launch", "livedata value: ${list.value}")
             mainHandler.post { callback(list) }
         }
     }
