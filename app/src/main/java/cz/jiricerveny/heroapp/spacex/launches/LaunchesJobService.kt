@@ -57,13 +57,15 @@ class LaunchesJobService : JobService() {
                     mainHandler.post {
                         app.sendNotification(true, message)
                     }
+                    jobFinished(params, false)
                 }
 
                 override fun onFailure(call: Call<List<Launch>>, t: Throwable) {
                     Toast.makeText(applicationContext, "can't load", Toast.LENGTH_LONG).show()
+                    jobFinished(params, false)
                 }
             })
-            jobFinished(params, false)
+
         }
         Thread(runnable).start()
     }

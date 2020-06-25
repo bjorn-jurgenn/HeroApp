@@ -15,7 +15,7 @@ import retrofit2.Callback
 import retrofit2.Response
 
 sealed class LaunchesState
-data class Loaded(val list: LiveData<List<Launch>>, val filtered: Boolean) : LaunchesState()
+data class Loaded(val list: LiveData<List<Launch>>) : LaunchesState()
 object Inserted : LaunchesState()
 object Loading : LaunchesState()
 object Failure : LaunchesState()
@@ -35,13 +35,6 @@ class LaunchesViewModel(
     val buttonChecked: LiveData<Boolean>
         get() = _buttonChecked
 
-    private val _filtering = MutableLiveData(false)
-    val filtering: LiveData<Boolean>
-        get() = _filtering
-
-    fun setFiltering() {
-        _filtering.value = true
-    }
 
     fun setChecked(isChecked: Boolean) {
         _buttonChecked.value = isChecked
@@ -58,8 +51,7 @@ class LaunchesViewModel(
         dbWrapper.getList {
             Log.i("Launch", "livedata value: ${it.value}")
             //if (it.value.isNullOrEmpty()) _state.value = Nothing
-            _state.value = Loaded(it, false)
-            _filtering.value = false
+            _state.value = Loaded(it)
         }
     }
 
@@ -73,8 +65,7 @@ class LaunchesViewModel(
         dbWrapper.getFromYear(year) {
             Log.i("Launch", "livedata value: ${it.value}")
             //if (it.value.isNullOrEmpty()) _state.value = Nothing
-            _state.value = Loaded(it, _filtering.value!!)
-            _filtering.value = false
+            _state.value = Loaded(it)
         }
     }
 
@@ -83,8 +74,7 @@ class LaunchesViewModel(
         dbWrapper.getBySuccess(success) {
             Log.i("Launch", "livedata value: ${it.value}")
             //if (it.value.isNullOrEmpty()) _state.value = Nothing
-            _state.value = Loaded(it, _filtering.value!!)
-            _filtering.value = false
+            _state.value = Loaded(it)
         }
     }
 
@@ -93,8 +83,7 @@ class LaunchesViewModel(
         dbWrapper.getBySuccessFromYear(success, year) {
             Log.i("Launch", "livedata value: ${it.value}")
             //if (it.value.isNullOrEmpty()) _state.value = Nothing
-            _state.value = Loaded(it, _filtering.value!!)
-            _filtering.value = false
+            _state.value = Loaded(it)
         }
     }
 
@@ -118,6 +107,5 @@ class LaunchesViewModel(
                 _state.value = Failure
             }
         })
-
     }
 }

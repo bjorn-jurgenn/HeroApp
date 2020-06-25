@@ -8,19 +8,9 @@ import android.content.Context
 import android.content.Intent
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
-import android.os.Handler
 import android.util.Log
 import android.widget.Toast
-import androidx.core.app.NotificationCompat
-import androidx.core.app.NotificationManagerCompat
 import cz.jiricerveny.heroapp.HeroApp
-import cz.jiricerveny.heroapp.R
-import cz.jiricerveny.heroapp.spacex.launches.database.DBWrapper
-import cz.jiricerveny.heroapp.spacex.launches.database.Launch
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
-import kotlin.random.Random
 
 val TAG = "LaunchesBroadcastReceiver"
 

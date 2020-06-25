@@ -14,10 +14,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
-import cz.jiricerveny.heroapp.HeroApp
-import cz.jiricerveny.heroapp.MainActivity
-import cz.jiricerveny.heroapp.NotificationReceiver
-import cz.jiricerveny.heroapp.R
+import cz.jiricerveny.heroapp.*
 import cz.jiricerveny.heroapp.databinding.FragmentDialogLaunchesBinding
 import cz.jiricerveny.heroapp.databinding.FragmentLaunchesBinding
 
@@ -77,7 +74,6 @@ class LaunchesFragment : Fragment() {
                 }
             }
         })
-        // TODO  observe data
         return binding.root
     }
 
@@ -98,15 +94,15 @@ class LaunchesFragment : Fragment() {
         val successChecked = binding.launchesDialogSuccessful.isChecked
         when {
             launchYearChecked && year != null && successChecked -> {
-                viewModel.setFiltering()
+                //viewModel.setFiltering()
                 viewModel.getBySuccessFromYear(successful, year)
             }
             launchYearChecked && year != null -> {
-                viewModel.setFiltering()
+                //viewModel.setFiltering()
                 viewModel.getFromYear(year)
             }
             successChecked -> {
-                viewModel.setFiltering()
+                //viewModel.setFiltering()
                 viewModel.getBySuccess(successful)
             }
             else -> viewModel.displayAll()
@@ -175,7 +171,7 @@ class LaunchesFragment : Fragment() {
 
         val notification = NotificationCompat.Builder(
             requireContext(),
-            (requireActivity().application as HeroApp).CHANNEL_1_ID
+            CHANNEL_1_ID
         )
             .setSmallIcon(R.drawable.ic_one)
             .setContentTitle("Completed")
@@ -192,7 +188,7 @@ class LaunchesFragment : Fragment() {
     private fun sendOnChannel2() {
         val notification = NotificationCompat.Builder(
             requireContext(),
-            (requireActivity().application as HeroApp).CHANNEL_2_ID
+            CHANNEL_2_ID
         )
             .setSmallIcon(R.drawable.ic_two)
             .setContentTitle("Settings changed")
