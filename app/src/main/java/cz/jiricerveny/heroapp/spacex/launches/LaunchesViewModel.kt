@@ -22,14 +22,12 @@ object Failure : LaunchesState()
 object Nothing : LaunchesState()
 
 class LaunchesViewModel(
-    database: LaunchDatabaseDao,
-    service: SpaceXEndpoints
+    val database: LaunchDatabaseDao,
+    private val service: SpaceXEndpoints
 ) : ViewModel() {
     private val _state = MutableLiveData<LaunchesState>(Inserted)
     val state: LiveData<LaunchesState>
         get() = _state
-
-    private val call = service.getLaunches(null, null)
 
     private val _buttonChecked = MutableLiveData(false)
     val buttonChecked: LiveData<Boolean>
@@ -90,7 +88,7 @@ class LaunchesViewModel(
     /** stáhne data ze SpaceXApi, uloží do databáze*/
     fun loadDataFromApi() {
         _state.value = Loading
-        call.clone().enqueue(object : Callback<List<Launch>> {
+        service.getLaunches(null, null).enqueue(object : Callback<List<Launch>> {
             override fun onResponse(
                 call: Call<List<Launch>>,
                 response: Response<List<Launch>>

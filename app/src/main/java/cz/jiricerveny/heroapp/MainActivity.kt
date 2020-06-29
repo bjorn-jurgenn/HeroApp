@@ -21,7 +21,6 @@ import cz.jiricerveny.heroapp.basic.AnimationDrawablesFragment
 import cz.jiricerveny.heroapp.basic.CardsFragment
 import cz.jiricerveny.heroapp.basic.ChangeUsernameDialogFragment
 import cz.jiricerveny.heroapp.basic.DialogsFragment
-import cz.jiricerveny.heroapp.spacex.launches.database.LaunchDatabase
 
 const val EXTRA_MESSAGE = "cz.jiricerveny.aboutme.MESSAGE"
 const val ACTIVITY_RESULT = "cz.jiricerveny.aboutme.RESULT"
@@ -37,12 +36,14 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     private lateinit var drawerLayout: DrawerLayout
     private lateinit var navView: NavigationView
     private lateinit var headerBinding: NavHeaderBinding
-    private lateinit var db: LaunchDatabase
     private var position: Int = 0
+    val app by lazy { applicationContext as HeroApp }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        val page = intent.getIntExtra("PAGE", 0)
+        position = page
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
@@ -65,6 +66,16 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             headerBinding.username.text = savedInstanceState.getString("USERNAME")
         }
         navigateTo(position)
+    }
+
+    override fun onStart() {
+        app.activityStarted()
+        super.onStart()
+    }
+
+    override fun onStop() {
+        app.activityStopped()
+        super.onStop()
     }
 
 

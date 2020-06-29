@@ -16,11 +16,25 @@ import cz.jiricerveny.heroapp.spacex.launches.database.LaunchDatabase
 
 //import cz.jiricerveny.heroapp.spacex.launches.LaunchesWifiBroadcastReceiver
 
-val CHANNEL_SERVICE_ID = "serviceChannel"
-val CHANNEL_1_ID = "channel1"
-val CHANNEL_2_ID = "channel2"
+const val CHANNEL_SERVICE_ID = "serviceChannel"
+const val CHANNEL_1_ID = "channel1"
+const val CHANNEL_2_ID = "channel2"
 
 class HeroApp : Application() {
+
+    private var activityVisible = false
+
+    fun isActivityVisible(): Boolean {
+        return activityVisible
+    }
+
+    fun activityStopped() {
+        activityVisible = false
+    }
+
+    fun activityStarted() {
+        activityVisible = true
+    }
 
     val db by lazy {
         Room.databaseBuilder(
@@ -91,7 +105,7 @@ class HeroApp : Application() {
         val serviceChannel = NotificationChannel(
             CHANNEL_SERVICE_ID,
             "Service Channel",
-            NotificationManager.IMPORTANCE_DEFAULT
+            NotificationManager.IMPORTANCE_MIN
         )
         serviceChannel.description = "Service Notification Channel"
 
@@ -110,8 +124,6 @@ class HeroApp : Application() {
         val firstTime = System.currentTimeMillis() + 10000
         alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, firstTime, (60 * 1000), alarmIntent)
     }
-
-
 }
 
 //    var isWifiConnected: Boolean? = false

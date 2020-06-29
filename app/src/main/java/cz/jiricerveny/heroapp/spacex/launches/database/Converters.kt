@@ -15,8 +15,8 @@ class Converters {
     }
 
     @TypeConverter
-    fun fromLaunchSite(launchSite: LaunchSite): String {
-        return launchSite.name
+    fun fromLaunchSite(launchSite: LaunchSite?): String {
+        return launchSite?.name ?: ""
     }
 
     @TypeConverter

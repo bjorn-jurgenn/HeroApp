@@ -16,11 +16,6 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-
-        <activity
-            android:name=".basic.ThirdDialogActivity"
-            android:theme="@style/AppTheme.ThirdDialog" />
-
         <activity
             android:name=".MainActivity"
             android:theme="@style/AppTheme.NoActionBar">
@@ -31,9 +26,15 @@
             </intent-filter>
         </activity>
 
+        <activity
+            android:name=".basic.ThirdDialogActivity"
+            android:theme="@style/AppTheme.ThirdDialog" />
+
+
         <receiver android:name=".NotificationReceiver" />
         <!--  <receiver android:name=".spacex.launches.LaunchesWifiBroadcastReceiver"/> -->
         <receiver android:name=".spacex.launches.LaunchesBroadcastReceiver" />
+
         <service
             android:name=".spacex.launches.LaunchesJobService"
             android:permission="android.permission.BIND_JOB_SERVICE"

@@ -4,13 +4,7 @@ import android.app.job.JobParameters
 import android.app.job.JobService
 import android.os.Handler
 import android.os.Looper
-import android.widget.Toast
 import cz.jiricerveny.heroapp.HeroApp
-import cz.jiricerveny.heroapp.spacex.launches.database.DBWrapper
-import cz.jiricerveny.heroapp.spacex.launches.database.Launch
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
 import kotlin.random.Random
 
 class LaunchesJobService : JobService() {
@@ -29,8 +23,10 @@ class LaunchesJobService : JobService() {
             val app = applicationContext as HeroApp
             val mainHandler = Handler(Looper.getMainLooper())
             val db = app.db
-            DBWrapper(db.launchDatabaseDao, mainHandler).clear()
-            val random = Random.nextInt(3)
+            db.launchDatabaseDao.clear()
+            val random = if (params?.extras?.getBoolean("ALL") != true) {
+                Random.nextInt(3)
+            } else 3
 
             val call = when (random) {
                 0 -> app.service.getLaunches(null, false)
@@ -44,29 +40,18 @@ class LaunchesJobService : JobService() {
                 2 -> "Only from 2015 launches loaded."
                 else -> "All launches loaded."
             }
-            call.clone().enqueue(object : Callback<List<Launch>> {
-                override fun onResponse(
-                    call: Call<List<Launch>>,
-                    response: Response<List<Launch>>
-                ) {
-                    val responseListOfLaunches = response.body() ?: listOf()
-                    val dbWrapper = DBWrapper(db.launchDatabaseDao, Handler())
-                    for (launchItem in responseListOfLaunches) {
-                        dbWrapper.insert(launchItem)
-                    }
-                    mainHandler.post {
-                        app.sendNotification(true, message)
-                    }
-                    jobFinished(params, false)
-                }
+            val responseList = call.execute().body() ?: listOf()
 
-                override fun onFailure(call: Call<List<Launch>>, t: Throwable) {
-                    Toast.makeText(applicationContext, "can't load", Toast.LENGTH_LONG).show()
-                    jobFinished(params, false)
-                }
-            })
+            for (launchItem in responseList) {
+                db.launchDatabaseDao.insert(launchItem)
+            }
 
+            mainHandler.post {
+                app.sendNotification(true, message)
+            }
+            jobFinished(params, false)
         }
+
         Thread(runnable).start()
     }
 

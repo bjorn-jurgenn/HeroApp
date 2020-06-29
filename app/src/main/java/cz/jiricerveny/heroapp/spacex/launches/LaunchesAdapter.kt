@@ -42,7 +42,7 @@ class LaunchesAdapter :
                     else -> itemStatus.text = "failure"
                 }
                 itemRocketName.text = launch.rocket.name
-                itemSiteName.text = launch.launchSite.name
+                itemSiteName.text = launch.launchSite?.name ?: ""
 
                 val zonedDateTime = ZonedDateTime.parse(launch.launchDateLocal)
                     .withZoneSameInstant(ZoneId.of("Europe/Paris"))

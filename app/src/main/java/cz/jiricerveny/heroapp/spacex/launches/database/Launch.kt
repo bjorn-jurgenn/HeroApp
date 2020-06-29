@@ -29,7 +29,7 @@ data class Launch(
     val launchSuccess: Boolean?,
     @SerializedName("launch_site")
     @ColumnInfo(name = "launch_site")
-    val launchSite: LaunchSite,
+    val launchSite: LaunchSite?,
     @SerializedName("detail")
     @ColumnInfo(name = "detail")
     val detail: String?,

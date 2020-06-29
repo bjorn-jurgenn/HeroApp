@@ -45,7 +45,7 @@ class DBWrapper(private val dao: LaunchDatabaseDao, private val mainHandler: Han
     fun getList(callback: (list: LiveData<List<Launch>>) -> Unit) {
         threadPool.execute {
             val list = dao.getList()
-            Log.i("LaunchDatabaseDao", "livedata value: ${list.value}")
+            Log.d("LaunchDatabaseDao", "livedata value: ${list.value}")
             mainHandler.post { callback(list) }
         }
     }
@@ -53,7 +53,7 @@ class DBWrapper(private val dao: LaunchDatabaseDao, private val mainHandler: Han
     fun getBySuccess(key: Boolean, callback: (list: LiveData<List<Launch>>) -> Unit) {
         threadPool.execute {
             val list = dao.getBySuccess(key)
-            Log.i("LaunchDatabaseDao", "livedata value: ${list.value}")
+            Log.d("LaunchDatabaseDao", "livedata value: ${list.value}")
             mainHandler.post { callback(list) }
         }
     }
@@ -61,7 +61,7 @@ class DBWrapper(private val dao: LaunchDatabaseDao, private val mainHandler: Han
     fun getFromYear(key: Int, callback: (list: LiveData<List<Launch>>) -> Unit) {
         threadPool.execute {
             val list = dao.getFromYear(key)
-            Log.i("Launch", "livedata value: ${list.value}")
+            Log.d("Launch", "livedata value: ${list.value}")
             mainHandler.post { callback(list) }
         }
     }
@@ -73,7 +73,7 @@ class DBWrapper(private val dao: LaunchDatabaseDao, private val mainHandler: Han
     ) {
         threadPool.execute {
             val list = dao.getBySuccessFromYear(success, launchYear)
-            Log.i("LaunchDatabaseDao", "livedata value: ${list.value}")
+            Log.d("LaunchDatabaseDao", "livedata value: ${list.value}")
             mainHandler.post { callback(list) }
         }
     }
